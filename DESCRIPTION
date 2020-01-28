@@ -1,0 +1,21 @@
+Package: anprflows
+Title: Explore and Model ANPR Traffic Flows
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Pedro",
+           family = "Pinto da Silva",
+           role = c("aut", "cre"),
+           email = "ppintodasilva@gmail.com")
+Description: Explore and Model Traffic Flows on Road Networks Equipped with ANPR
+  Traffic Cameras.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+Suggests: 
+    testthat (>= 2.1.0)
+Imports: 
+    dplyr,
+    ggplot2,
+    tidyr,
+    readr
