@@ -7,13 +7,14 @@
 plot_demand_od(
   flows_od,
   time_breaks = NULL,
+  title = NULL,
   point_alpha = 0.5,
   point_size = 0.75,
-  title = NA
+  line_size = 0.5
 )
 }
 \arguments{
-\item{flows}{Trimmed flows tibble.}
+\item{flows_od}{Trimmed flows$od tibble.}
 }
 \description{
 Plot traffic demand over time, grouped by od pair.

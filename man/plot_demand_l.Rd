@@ -7,13 +7,14 @@
 plot_demand_l(
   flows_l,
   time_breaks = NULL,
+  title = NULL,
   point_alpha = 0.5,
   point_size = 0.75,
-  title = NA
+  line_size = 0.5
 )
 }
 \arguments{
-\item{flows_l}{Trimmed flows tibble.}
+\item{flows_l}{Trimmed flows$l tibble.}
 
 \item{point_alpha}{Alpha parameter of point layer}
 

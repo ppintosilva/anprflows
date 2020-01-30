@@ -4,10 +4,20 @@
 \alias{plot_speed_od}
 \title{Plot traffic speed over time, grouped by od pair.}
 \usage{
-plot_speed_od()
+plot_speed_od(
+  flows_od,
+  time_breaks = NULL,
+  title = NULL,
+  point_alpha = 0.5,
+  point_size = 0.75,
+  add_ribbon = TRUE,
+  ribbon_alpha = 0.4,
+  ribbon_fill = "grey90",
+  line_size = 0.5
+)
 }
 \arguments{
-\item{flows}{Trimmed flows tibble.}
+\item{flows_od}{Trimmed flows$od tibble.}
 }
 \description{
 Plot traffic speed over time, grouped by od pair.
