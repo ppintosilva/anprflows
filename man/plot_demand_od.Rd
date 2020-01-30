@@ -4,7 +4,13 @@
 \alias{plot_demand_od}
 \title{Plot traffic demand over time, grouped by od pair.}
 \usage{
-plot_demand_od()
+plot_demand_od(
+  flows_od,
+  time_breaks = NULL,
+  point_alpha = 0.5,
+  point_size = 0.75,
+  title = NA
+)
 }
 \arguments{
 \item{flows}{Trimmed flows tibble.}

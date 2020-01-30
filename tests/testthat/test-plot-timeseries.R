@@ -31,3 +31,13 @@ test_that("timeseries demand plot works", {
 
   vdiffr::expect_doppelganger("ggplot2 demand hour", p_demand_l_h)
 })
+
+test_that("timeseries demand plot works", {
+  p_demand_od_05 <-
+    plot_demand_od(
+      incident$flows_05$od,
+      time_breaks = incident$breaks
+    )
+
+  vdiffr::expect_doppelganger("ggplot2 demand od 5 min", p_demand_od_05)
+})

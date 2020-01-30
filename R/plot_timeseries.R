@@ -45,8 +45,36 @@ plot_demand_l <- function(
 #'
 #' @param flows Trimmed flows tibble.
 #' @export
-plot_demand_od <- function() {
-  return(TRUE)
+plot_demand_od <- function(
+  flows_od, time_breaks = NULL, point_alpha = .5, point_size = .75, title = NA)
+{
+  # n_distinct_ods <-
+  #   flows_od %>% distinct(o,d) %>% summarise(total = n()) %>% pull(total)
+  #
+  # stopifnot(n_distinct_ods <= 10)
+
+  flows_od %>%
+    unite("od", o, d, sep = "->") %>%
+    ggplot() +
+    geom_line(
+      aes(x = t, y = flow, color = od)
+    ) +
+    geom_point(
+      aes(x = t, y = flow, color = od),
+      alpha = point_alpha,
+      size = point_size
+    ) +
+    {
+      if(is.null(time_breaks)) .
+      else {
+        scale_x_datetime(
+          breaks = time_breaks,
+          labels = get_time_labels(time_breaks)
+        )
+      }
+    } +
+    ggtitle(title) +
+    theme_bw()
 }
 
 #' Plot traffic speed over time, grouped by od pair.
