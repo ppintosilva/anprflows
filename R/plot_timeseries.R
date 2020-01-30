@@ -2,7 +2,6 @@
 
 #' Plot traffic demand over time, grouped by location.
 #'
-#' @param flows Trimmed flows tibble.
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_wider
 #' @importFrom ggplot2 ggplot aes geom_line geom_point scale_x_datetime theme_bw
