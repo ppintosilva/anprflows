@@ -19,8 +19,6 @@ plot_demand_l(
 \item{point_alpha}{Alpha parameter of point layer}
 
 \item{point_size}{Size parameter of point layer}
-
-\item{flows}{Trimmed flows tibble.}
 }
 \description{
 Plot traffic demand over time, grouped by location.
