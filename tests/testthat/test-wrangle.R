@@ -43,3 +43,22 @@ test_that("two csv files are read well", {
 
   expect_equal(binded_flows, character_raw_flows)
 })
+
+test_that("location and od flows are computed well from raw flows", {
+  flows_l <-
+    get_flows_l(raw_flows)
+
+  expected_names_l <-
+    c("l", "t", "type", "flow")
+
+  expect_equal(names(flows_l), expected_names_l)
+
+  flows_od <-
+    get_flows_od(raw_flows, flows_l)
+
+  expected_names_od <-
+    c("o", "d", "t", "flow_o_out", "flow", "flow_d_in", "rate_o", "rate_d",
+      "median_speed", "mean_speed", "sd_speed")
+
+  expect_equal(names(flows_od), expected_names_od)
+})
