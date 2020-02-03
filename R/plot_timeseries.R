@@ -5,13 +5,12 @@
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_wider
 #' @importFrom ggplot2 ggplot aes geom_line geom_point scale_x_datetime theme_bw
-#' ggtitle
 #' @param flows_l Trimmed flows$l tibble.
 #' @param point_alpha Alpha parameter of point layer
 #' @param point_size Size parameter of point layer
 #' @export
 plot_demand_l <- function(
-  flows_l, time_breaks = NULL, title = NULL,
+  flows_l, time_breaks = NULL,
   point_alpha = .5, point_size = .75,
   line_size = .5
 ) {
@@ -43,7 +42,6 @@ plot_demand_l <- function(
         )
       }
     } +
-    ggtitle(title) +
     theme_bw()
 }
 
@@ -52,7 +50,7 @@ plot_demand_l <- function(
 #' @param flows_od Trimmed flows$od tibble.
 #' @export
 plot_demand_od <- function(
-  flows_od, time_breaks = NULL, title = NULL,
+  flows_od, time_breaks = NULL,
   point_alpha = .5, point_size = .75,
   line_size = .5
 ) {
@@ -86,7 +84,6 @@ plot_demand_od <- function(
         )
       }
     } +
-    ggtitle(title) +
     theme_bw()
 }
 
@@ -95,7 +92,7 @@ plot_demand_od <- function(
 #' @param flows_od Trimmed flows$od tibble.
 #' @export
 plot_speed_od <- function(
-  flows_od, time_breaks = NULL, title = NULL,
+  flows_od, time_breaks = NULL,
   point_alpha = .5, point_size = .75,
   add_ribbon = TRUE, ribbon_alpha = .4, ribbon_fill = "grey90",
   line_size = .5
@@ -144,7 +141,6 @@ plot_speed_od <- function(
         )
       }
     } +
-    ggtitle(title) +
     scale_y_continuous("Mean speed") +
     theme_bw()
 }

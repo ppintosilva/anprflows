@@ -7,7 +7,6 @@
 plot_demand_l(
   flows_l,
   time_breaks = NULL,
-  title = NULL,
   point_alpha = 0.5,
   point_size = 0.75,
   line_size = 0.5

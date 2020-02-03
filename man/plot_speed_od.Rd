@@ -7,7 +7,6 @@
 plot_speed_od(
   flows_od,
   time_breaks = NULL,
-  title = NULL,
   point_alpha = 0.5,
   point_size = 0.75,
   add_ribbon = TRUE,

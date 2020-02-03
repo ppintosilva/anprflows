@@ -26,7 +26,6 @@ test_that("timeseries demand location plot works", {
     plot_demand_l(
       incident$flows_h$l,
       time_breaks = incident$breaks,
-      title = "Hour flows at incident locations"
     )
 
   vdiffr::expect_doppelganger("ggplot2 demand hour", p_demand_l_h)
