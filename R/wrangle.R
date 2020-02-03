@@ -70,3 +70,92 @@ get_flows_od <- function(flows, flows_l) {
            median_speed, mean_speed, sd_speed) %>%
     ungroup()
 }
+
+#' Plot a map of
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter distinct pull inner_join
+#' @import sf
+#' @param flows_od Trimmed flows$od tibble.
+#' @param spatial List of spatial features.
+#' @param arterial_highway Only keep arterial edges with this value in the
+#' highway attribute.
+#' @param bbox_margin Spatial margin added to flows bounding box.
+#' @export
+crop_spatial <- function(
+  flows_od,
+  spatial,
+  arterial_highway = "residential",
+  bbox_margin = c(-250,-250,250,250)
+) {
+  # get unique locations observed in the data
+  observed_locations <-
+    union(
+      flows_od %>% distinct(o) %>% pull(o),
+      flows_od %>% distinct(d) %>% pull(d)
+    )
+
+  # subset locations by existing flows
+  locations <-
+    spatial$locations %>%
+    filter(id %in% observed_locations)
+
+  # od combinations
+  od_combinations <-
+    flows_od %>%
+    filter(o != "SOURCE", d != "SINK") %>%
+    distinct(o,d)
+
+  pairs <-
+    suppressWarnings(
+      inner_join(
+        spatial$pairs,
+        od_combinations,
+        by = c("o" = "o", "d" = "d")
+      )
+    )
+
+
+  # intersection primary and arterial with flows (zoom in)
+  bbox <-
+    flows_od %>%
+    filter(o != "SOURCE", d != "SINK") %>%
+    pull(geometry) %>%
+    sf::st_bbox() +
+    bbox_margin
+
+  # looking for arterial network data in
+  #   spatial$arterial and spatial$arterial$edges
+  if(is.null(spatial$arterial$edges)) {
+    arterial <- suppressWarnings(sf::st_crop(spatial$arterial, bbox))
+  } else {
+    arterial <- suppressWarnings(sf::st_crop(spatial$arterial$edges, bbox))
+  }
+
+  arterial <-
+    arterial %>%
+    {
+      if(!is.null(arterial_highway))
+        filter(., highway == arterial_highway)
+    }
+
+  # looking for primary network data in
+  #   spatial$primary and spatial$primary$edges
+  if(is.null(spatial$primary$edges)) {
+    primary <- suppressWarnings(sf::st_crop(spatial$primary, bbox))
+  } else {
+    primary <- suppressWarnings(sf::st_crop(spatial$primary$edges, bbox))
+  }
+
+  amenities <- suppressWarnings(sf::st_crop(spatial$amenities, bbox))
+
+  return(
+    list(
+      "locations" = locations,
+      "pairs" = pairs,
+      "primary" = primary,
+      "arterial" = arterial,
+      "amenities" = amenities
+    )
+  )
+}
