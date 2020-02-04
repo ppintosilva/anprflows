@@ -71,7 +71,7 @@ get_flows_od <- function(flows, flows_l) {
     ungroup()
 }
 
-#' Plot a map of
+#' Crop spatial features based on flow data.
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter distinct pull inner_join
@@ -158,4 +158,115 @@ crop_spatial <- function(
       "amenities" = amenities
     )
   )
+}
+
+
+#' Get the total od flow in the network.
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr group_by summarise pull filter
+#' @importFrom assertr verify
+#' @param flows_od Flows$od tibble.
+#' @param by_period Whether to aggregate total flow by period.
+#' @param ignore_sink_source Whether to include ods containing source and sink.
+#' @export
+get_total_flow <- function(
+  flows_od,
+  by_period = TRUE,
+  ignore_sink_source = TRUE
+) {
+  flows_od %>%
+    {
+      if(ignore_sink_source) {
+        filter(., o != "SOURCE", d != "SINK")
+      } else .
+    } %>%
+    {
+      if(by_period) {
+        group_by(.,t) %>%
+          summarise(total_flow = sum(flow))
+      } else {
+        sum(.$flow)
+      }
+    }
+}
+
+#' Get the subset of flows whose OD pairs account for the top
+#' p proportion of total or period-wise observed traffic flow.
+#' Returns all od pairs up to the first od pair that exceeds p.
+#'
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr group_by summarise arrange filter mutate select desc
+#' @param flows_od Flows$od tibble.
+#' @param p Desired proportion of total traffic.
+#' @param by_period Whether to aggregate total flow by period.
+#' @param ignore_sink_source Whether to include ods containing source and sink.
+#' @export
+top_contributors <- function(
+  flows_od,
+  p = .9,
+  by_period = TRUE,
+  ignore_sink_source = TRUE
+){
+  epsilon <- 1e-5
+  total_flow <- get_total_flow(flows_od, by_period, ignore_sink_source)
+
+  cumflows <-
+    flows_od %>%
+    {
+      if(ignore_sink_source) {
+        filter(., o != "SOURCE", d != "SINK")
+      } else .
+    } %>%
+    {
+      if(by_period) {
+        group_by(.,t)
+      } else {
+        group_by(.,o,d) %>% summarise(flow = sum(flow)) %>% ungroup()
+      }
+    } %>%
+    arrange(desc(flow)) %>%
+    {
+      if(by_period) {
+        {nrow(.) -> expected_rows}
+        inner_join(
+          ., total_flow,
+          by = c("t" = "t")
+        ) %>%
+        verify(nrow(.) == expected_rows)
+      } else .
+    } %>%
+    mutate(p_cumflow = cumsum(flow)/total_flow)
+
+  # return nearest p_cumflow that is greater than p
+  threshold <-
+    cumflows %>%
+    {
+      if(by_period) {
+        group_by(.,t) %>%
+        summarise(pthreshold = first_element_greater(p_cumflow, p))
+      }
+      else {
+        summarise(., el = first_element_greater(p_cumflow, p)) %>% pull(el)
+      }
+    }
+
+  cumflows %>%
+    {
+      if(by_period) {
+        {nrow(.) -> expected_rows}
+        inner_join(
+          ., threshold,
+          by = c("t" = "t")
+        ) %>%
+          verify(nrow(.) == expected_rows)
+      } else {
+        mutate(., pthreshold = threshold)
+      }
+    } %>%
+    # adding small epsilon to guarantee float comparison returns true for
+    # values equal to pthreshold
+    filter(p_cumflow <= (pthreshold + epsilon)) %>%
+    select(-pthreshold)
 }

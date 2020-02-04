@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrangle.R
 \name{crop_spatial}
 \alias{crop_spatial}
-\title{Plot a map of}
+\title{Crop spatial features based on flow data.}
 \usage{
 crop_spatial(
   flows_od,
@@ -22,5 +22,5 @@ highway attribute.}
 \item{bbox_margin}{Spatial margin added to flows bounding box.}
 }
 \description{
-Plot a map of
+Crop spatial features based on flow data.
 }

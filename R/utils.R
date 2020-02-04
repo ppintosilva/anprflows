@@ -10,3 +10,12 @@ get_time_labels <- function(time_breaks) {
   )
   return(time_labels)
 }
+
+#' Get first element greater than number in vector.
+#'
+#' @param vec Numeric.
+#' @param number Numeric of length 1.
+first_element_greater <- function(vec, number){
+  el <- vec[vec > number][1]
+  ifelse(is.na(el), vec[length(vec)], el)
+}
