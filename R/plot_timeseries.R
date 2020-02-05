@@ -3,7 +3,7 @@
 #' Plot traffic demand over time, grouped by location.
 #'
 #' @importFrom magrittr %>%
-#' @importFrom tidyr pivot_wider
+#' @importFrom tidyr pivot_wider unite
 #' @importFrom ggplot2 ggplot aes geom_line geom_point scale_x_datetime theme_bw
 #' @param flows_l Trimmed flows$l tibble.
 #' @param point_alpha Alpha parameter of point layer

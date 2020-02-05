@@ -1,7 +1,7 @@
 #' Calculate flows at all unique locations of the road network
 #'
 #' @importFrom magrittr %>%
-#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_longer replace_na
 #' @importFrom dplyr group_by summarise rename full_join mutate arrange
 #' @importFrom dplyr select ungroup
 #' @param flows A 'raw' flows dataset.

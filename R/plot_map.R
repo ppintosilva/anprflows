@@ -12,7 +12,7 @@ polygon_col <- "N 9/0"
 #'
 #' @importFrom magrittr %>%
 #' @importFrom ggplot2 ggplot aes geom_line geom_point scale_x_datetime theme_bw
-#' ggtitle
+#' ggtitle geom_sf sym scale_fill_brewer theme element_blank
 #' @param spatial List of spatial features.
 #' @param flows Optional summarised flows$l tibble.
 #' @param add_primary Whether to plot primary network.
@@ -31,6 +31,8 @@ polygon_col <- "N 9/0"
 #' @param aes_color_locations Color aesthetic to use for locations as
 #'  a character.
 #' @param aes_color_flows Color aesthetic to use for paths as a character.
+#'
+#' @export
 plot_map <- function(
   spatial,
   flows = NULL,
