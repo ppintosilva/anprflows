@@ -5,13 +5,16 @@ NA_LOCATION <- 999999
 #'
 #' @param filenames Vector of one or more filenames
 #' @param datetime_format Format of datetime column.
+#' @param ... Further parameters passed to read_csv
 #'
 #' @return A tibble containing "raw" flow data.
 #'
 #' @export
 #'
 #' @importFrom magrittr %>% %<>%
-read_flows_csv <- function(filenames, datetime_format = '%Y-%m-%d %H:%M:%S')
+read_flows_csv <- function(filenames,
+                           datetime_format = '%Y-%m-%d %H:%M:%S',
+                           ...)
 {
   flows <- tidyr::tibble()
 
@@ -29,7 +32,8 @@ read_flows_csv <- function(filenames, datetime_format = '%Y-%m-%d %H:%M:%S')
         median_speed = 'd',
         mean_speed = 'd',
         sd_speed = 'd'
-      )
+      ),
+      ...
     )
 
     flows <- dplyr::bind_rows(flows, new_flows)

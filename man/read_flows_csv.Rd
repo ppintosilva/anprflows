@@ -4,12 +4,14 @@
 \alias{read_flows_csv}
 \title{Read one or more flows csv files into R}
 \usage{
-read_flows_csv(filenames, datetime_format = "\%Y-\%m-\%d \%H:\%M:\%S")
+read_flows_csv(filenames, datetime_format = "\%Y-\%m-\%d \%H:\%M:\%S", ...)
 }
 \arguments{
 \item{filenames}{Vector of one or more filenames}
 
 \item{datetime_format}{Format of datetime column.}
+
+\item{...}{Further parameters passed to read_csv}
 }
 \value{
 A tibble containing "raw" flow data.
