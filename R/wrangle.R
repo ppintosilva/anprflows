@@ -203,7 +203,7 @@ get_total_flow <- function(
 #' @param by_period Whether to aggregate total flow by period.
 #' @param ignore_sink_source Whether to include ods containing source and sink.
 #' @export
-top_contributors <- function(
+top_flows <- function(
   flows_od,
   p = .9,
   by_period = TRUE,
