@@ -36,6 +36,7 @@ flows_od_8am_slice <-
 p1a <- plot_small_network(summarised_raw_flows,
                           num_scale = 0.001,
                           ignore_source_sink = TRUE)
+
 p1b <- plot_small_network(summarised_raw_flows,
                           num_accuracy = NULL,
                           aes_edge_label = "flow",
@@ -43,6 +44,7 @@ p1b <- plot_small_network(summarised_raw_flows,
 
 p2a <- plot_small_network(raw_flows_8am_slice,
                           ignore_source_sink = TRUE)
+
 p2b <- plot_small_network(raw_flows_8am_slice,
                           aes_edge_color = "flow")
 
@@ -50,9 +52,11 @@ p3a <- plot_small_network(flows_od_8am_slice,
                           aes_edge_color = "rate_o",
                           aes_edge_label = "rate_o",
                           num_accuracy = .01)
+
 p3b <- plot_small_network(flows_od_8am_slice,
                           aes_edge_label = "rate_d",
                           num_accuracy = .01)
+
 p3c <- plot_small_network(flows_od_8am_slice,
                           aes_edge_label = "",
                           aes_edge_color = "rate_d")
@@ -74,4 +78,11 @@ test_that("plot small network works", {
     "small network 3 slice b", p3b)
   vdiffr::expect_doppelganger(
     "small network 3 slice c",p3c)
+
+  vdiffr::expect_doppelganger(
+    "small network 2 raw slice a plus geom point",
+    p2a +
+      geom_node_point(aes(color = factor(name)), size = 4) +
+      scale_color_brewer("name", palette = "Set2")
+  )
 })
