@@ -67,7 +67,7 @@ plot_map <- function(
   if(aes_color_locations == "") {
     locations <- spatial$locations
   } else {
-    locations <- spatial$locations %>% st_buffer(30)
+    locations <- spatial$locations %>% st_buffer(size_locations * 10)
   }
 
   if(aes_color_flows == "") {
