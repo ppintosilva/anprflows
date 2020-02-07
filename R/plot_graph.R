@@ -21,7 +21,6 @@ plot_small_network <- function(
   edge_end_cap = circle(2, 'mm'),
   edge_width = 1,
   edge_alpha = .75,
-  edge_color_palette = "Blues",
   node_size = 4,
   node_color = munsell::mnsl("5BG 6/4"),
   aes_node_label = "name",
@@ -66,9 +65,9 @@ plot_small_network <- function(
     ggraph(layout = graph_layout) +
     geom_edge_fan(
       aes(
-        colour = !!sym(aes_edge_color),
+        color = !!sym(aes_edge_color),
         label = !!sym(label_mapping)
-        ),
+      ),
       angle_calc = edge_angle_calc,
       label_dodge = edge_label_dodge,
       arrow = edge_arrow,
@@ -84,11 +83,12 @@ plot_small_network <- function(
     {
       if(aes_node_label != "") {
         geom_node_text(
-          aes(label = !!sym(aes_node_label)),
+          aes(
+            label = !!sym(aes_node_label)
+          ),
           nudge_y = node_label_nudge_y,
           nudge_x = node_label_nudge_x
         )
       }
-    } +
-    ggplot2::scale_colour_brewer(edge_color_palette)
+    }
 }
