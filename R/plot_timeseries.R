@@ -76,8 +76,7 @@ plot_demand_od <- function(
       size = point_size
     ) +
     {
-      if(is.null(time_breaks)) .
-      else {
+      if(!is.null(time_breaks)) {
         scale_x_datetime(
           breaks = time_breaks,
           labels = get_time_labels(time_breaks)
