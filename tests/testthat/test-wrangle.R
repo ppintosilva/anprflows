@@ -103,22 +103,22 @@ test_that("spatial crop works", {
   )
 })
 
-test_that("top contributors work", {
+test_that("top flows work", {
   raw_flows_no_source_sink <- raw_flows %>% filter(o != "SOURCE", d != "SINK")
 
-  top100p <- top_contributors(raw_flows, p = 1.0, by_period = TRUE)
+  top100p <- top_flows(raw_flows, p = 1.0, by_period = TRUE)
 
   expect_true(nrow(top100p) == nrow(raw_flows_no_source_sink))
 
-  top30p <- top_contributors(raw_flows, p = .3, by_period = TRUE)
+  top30p <- top_flows(raw_flows, p = .3, by_period = TRUE)
 
   expect_true(nrow(top30p) < nrow(raw_flows_no_source_sink))
 
-  top100p_total <- top_contributors(raw_flows, p = 1.0, by_period = FALSE)
+  top100p_total <- top_flows(raw_flows, p = 1.0, by_period = FALSE)
 
   expect_true(nrow(top100p_total) <= nrow(top100p))
 
-  top30p_total <- top_contributors(raw_flows, p = .3, by_period = FALSE)
+  top30p_total <- top_flows(raw_flows, p = .3, by_period = FALSE)
 
   expect_true(nrow(top30p_total) <= nrow(top30p))
 })
