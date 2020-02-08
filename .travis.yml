@@ -2,7 +2,3 @@
 
 language: R
 cache: packages
-sudo: false
-dist: trusty
-latex: false
-fortran: false
