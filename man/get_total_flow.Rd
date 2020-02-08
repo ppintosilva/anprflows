@@ -13,6 +13,9 @@ get_total_flow(flows_od, by_period = TRUE, ignore_sink_source = TRUE)
 
 \item{ignore_sink_source}{Whether to include ods containing source and sink.}
 }
+\value{
+flows_od [tibble][tibble::tibble-package]
+}
 \description{
 Get the total od flow in the network.
 }

@@ -17,6 +17,9 @@ top_flows(flows_od, p = 0.9, by_period = TRUE, ignore_sink_source = TRUE)
 
 \item{ignore_sink_source}{Whether to include ods containing source and sink.}
 }
+\value{
+flows_od [tibble][tibble::tibble-package]
+}
 \description{
 Get the subset of flows whose OD pairs account for the top
 p proportion of total or period-wise observed traffic flow.

@@ -21,6 +21,9 @@ highway attribute.}
 
 \item{bbox_margin}{Spatial margin added to flows bounding box.}
 }
+\value{
+[list]
+}
 \description{
 Crop spatial features based on flow data.
 }

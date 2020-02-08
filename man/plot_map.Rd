@@ -35,6 +35,8 @@ plot_map(
 
 \item{add_paths}{Whether to plot shortest paths between locations.}
 
+\item{add_locations}{Whether to plot observed locations.}
+
 \item{color_primary}{Color of primary network.}
 
 \item{color_arterial}{Color of arterial network.}

@@ -11,6 +11,9 @@ get_flows_od(flows, flows_l)
 
 \item{flows_l}{Flows at unique locations}
 }
+\value{
+flows_od [tibble][tibble::tibble-package]
+}
 \description{
 Calculate flow rates for all OD pairs in the road network
 }

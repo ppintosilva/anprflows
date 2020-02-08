@@ -28,6 +28,42 @@ plot_small_network(
 }
 \arguments{
 \item{flows_od}{Summarised or windowed od flows tibble.}
+
+\item{ignore_source_sink}{Whether to ignore source and sink nodes.}
+
+\item{num_accuracy}{Number format accuracy of edge labels.}
+
+\item{num_scale}{Multiplicative factor applied to edge labels.}
+
+\item{graph_layout}{ggraph layout parameter}
+
+\item{aes_edge_color}{Optionally color edges according to this aesthetic}
+
+\item{aes_edge_label}{Optionally label edges according to this aesthetic}
+
+\item{edge_angle_calc}{Edges label angle parameter}
+
+\item{edge_label_dodge}{Edges label dodge parameter}
+
+\item{edge_arrow}{Edge arrow}
+
+\item{edge_start_cap}{Arrow distance from starting node}
+
+\item{edge_end_cap}{Arrow distance from ending node}
+
+\item{edge_width}{Edge width}
+
+\item{edge_alpha}{Edge alpha}
+
+\item{node_size}{Node size}
+
+\item{node_color}{Node color}
+
+\item{aes_node_label}{Optionally label nodes according to this aesthetic}
+
+\item{node_label_nudge_y}{Shift amount applied node labels on the y axis}
+
+\item{node_label_nudge_x}{Shift amount applied node labels on the x axis}
 }
 \description{
 Plot flow network.

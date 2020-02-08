@@ -11,7 +11,6 @@ NA_LOCATION <- 999999
 #'
 #' @export
 #'
-#' @importFrom magrittr %>% %<>%
 read_flows_csv <- function(filenames,
                            datetime_format = '%Y-%m-%d %H:%M:%S',
                            ...)
@@ -39,7 +38,8 @@ read_flows_csv <- function(filenames,
     flows <- dplyr::bind_rows(flows, new_flows)
   }
 
-  flows %<>%
+  flows <-
+    flows %>%
     dplyr::mutate(
       o = forcats::fct_explicit_na(as.factor(dplyr::na_if(o, NA_LOCATION)),
                                    na_level = "SOURCE"),
@@ -52,7 +52,8 @@ read_flows_csv <- function(filenames,
   llevels <- union(levels(flows$o), levels(flows$d))
 
   # Make factor levels the same for location columns
-  flows %<>%
+  flows <-
+    flows %>%
     dplyr::mutate(
       o = factor(o, levels = llevels),
       d = factor(d, levels = llevels)

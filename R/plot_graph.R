@@ -1,11 +1,27 @@
 #' Plot flow network.
 #'
 #' @param flows_od Summarised or windowed od flows tibble.
+#' @param ignore_source_sink Whether to ignore source and sink nodes.
+#' @param num_accuracy Number format accuracy of edge labels.
+#' @param num_scale Multiplicative factor applied to edge labels.
+#' @param graph_layout ggraph layout parameter
+#' @param aes_edge_color Optionally color edges according to this aesthetic
+#' @param aes_edge_label Optionally label edges according to this aesthetic
+#' @param edge_angle_calc Edges label angle parameter
+#' @param edge_label_dodge Edges label dodge parameter
+#' @param edge_arrow Edge arrow
+#' @param edge_start_cap Arrow distance from starting node
+#' @param edge_end_cap Arrow distance from ending node
+#' @param edge_width Edge width
+#' @param edge_alpha Edge alpha
+#' @param node_size Node size
+#' @param node_color Node color
+#' @param aes_node_label Optionally label nodes according to this aesthetic
+#' @param node_label_nudge_y Shift amount applied node labels on the y axis
+#' @param node_label_nudge_x Shift amount applied node labels on the x axis
 #'
 #' @export
 #'
-#' @importFrom magrittr %>%
-#' @importFrom tibble has_name
 plot_small_network <- function(
   flows_od,
   ignore_source_sink = FALSE,
@@ -46,7 +62,7 @@ plot_small_network <- function(
       } else .
     } %>%
     {
-      if(has_name(., 't')) {
+      if(tibble::has_name(., 't')) {
         select(., -t)
       } else .
     } %>%

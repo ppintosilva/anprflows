@@ -10,14 +10,12 @@ polygon_col <- "N 9/0"
 
 #' Plot traffic demand over time, grouped by location.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom ggplot2 ggplot aes geom_line geom_point scale_x_datetime theme_bw
-#' ggtitle geom_sf sym scale_fill_brewer theme element_blank
 #' @param spatial List of spatial features.
 #' @param flows Optional summarised flows$l tibble.
 #' @param add_primary Whether to plot primary network.
 #' @param add_arterial Whether to plot arterial network.
 #' @param add_paths Whether to plot shortest paths between locations.
+#' @param add_locations Whether to plot observed locations.
 #' @param color_primary Color of primary network.
 #' @param color_arterial Color of arterial network.
 #' @param color_locations Color of locations.
@@ -67,7 +65,7 @@ plot_map <- function(
   if(aes_color_locations == "") {
     locations <- spatial$locations
   } else {
-    locations <- spatial$locations %>% st_buffer(size_locations * 10)
+    locations <- spatial$locations %>% sf::st_buffer(size_locations * 10)
   }
 
   if(aes_color_flows == "") {

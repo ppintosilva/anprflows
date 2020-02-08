@@ -1,11 +1,11 @@
 #' Calculate flows at all unique locations of the road network
 #'
-#' @importFrom magrittr %>%
-#' @importFrom tidyr pivot_longer replace_na
-#' @importFrom dplyr group_by summarise rename full_join mutate arrange
-#' @importFrom dplyr select ungroup
 #' @param flows A 'raw' flows dataset.
+#'
+#' @return flows_l [tibble][tibble::tibble-package]
+#'
 #' @export
+#'
 get_flows_l <- function(flows) {
   in_flows <-
     flows %>%
@@ -36,12 +36,13 @@ get_flows_l <- function(flows) {
 
 #' Calculate flow rates for all OD pairs in the road network
 #'
-#' @importFrom magrittr %>%
-#' @importFrom assertr verify
-#' @importFrom dplyr filter rename inner_join mutate select ungroup
 #' @param flows A 'raw' flows dataset.
 #' @param flows_l Flows at unique locations
+#'
+#' @return flows_od [tibble][tibble::tibble-package]
+#'
 #' @export
+#'
 get_flows_od <- function(flows, flows_l) {
   flows %>%
     {
@@ -73,15 +74,15 @@ get_flows_od <- function(flows, flows_l) {
 
 #' Crop spatial features based on flow data.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom dplyr filter distinct pull inner_join
-#' @import sf
 #' @param flows_od Trimmed flows$od tibble.
 #' @param spatial List of spatial features.
 #' @param arterial_highway Only keep arterial edges with this value in the
 #' highway attribute.
 #' @param bbox_margin Spatial margin added to flows bounding box.
+#'
+#' @return [list]
 #' @export
+#'
 crop_spatial <- function(
   flows_od,
   spatial,
@@ -163,13 +164,14 @@ crop_spatial <- function(
 
 #' Get the total od flow in the network.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom dplyr group_by summarise pull filter
-#' @importFrom assertr verify
 #' @param flows_od Flows$od tibble.
 #' @param by_period Whether to aggregate total flow by period.
 #' @param ignore_sink_source Whether to include ods containing source and sink.
+#'
+#' @return flows_od [tibble][tibble::tibble-package]
+#'
 #' @export
+#'
 get_total_flow <- function(
   flows_od,
   by_period = TRUE,
@@ -195,14 +197,15 @@ get_total_flow <- function(
 #' p proportion of total or period-wise observed traffic flow.
 #' Returns all od pairs up to the first od pair that exceeds p.
 #'
-#'
-#' @importFrom magrittr %>%
-#' @importFrom dplyr group_by summarise arrange filter mutate select desc
 #' @param flows_od Flows$od tibble.
 #' @param p Desired proportion of total traffic.
 #' @param by_period Whether to aggregate total flow by period.
 #' @param ignore_sink_source Whether to include ods containing source and sink.
+#'
+#' @return flows_od [tibble][tibble::tibble-package]
+#'
 #' @export
+#'
 top_flows <- function(
   flows_od,
   p = .9,
@@ -248,7 +251,7 @@ top_flows <- function(
         summarise(pthreshold = first_element_greater(p_cumflow, p))
       }
       else {
-        summarise(., el = first_element_greater(p_cumflow, p)) %>% pull(el)
+        summarise(., elem = first_element_greater(p_cumflow, p)) %>% pull(elem)
       }
     }
 

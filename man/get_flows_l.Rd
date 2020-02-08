@@ -9,6 +9,9 @@ get_flows_l(flows)
 \arguments{
 \item{flows}{A 'raw' flows dataset.}
 }
+\value{
+flows_l [tibble][tibble::tibble-package]
+}
 \description{
 Calculate flows at all unique locations of the road network
 }

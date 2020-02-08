@@ -2,13 +2,16 @@
 
 #' Plot traffic demand over time, grouped by location.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom tidyr pivot_wider unite
-#' @importFrom ggplot2 ggplot aes geom_line geom_point scale_x_datetime theme_bw
 #' @param flows_l Trimmed flows$l tibble.
+#' @param time_breaks Breaks for scale_x_datetime
 #' @param point_alpha Alpha parameter of point layer
 #' @param point_size Size parameter of point layer
+#' @param line_size Size parameter of line layer
+#'
 #' @export
+#'
+#' @importFrom tidyr pivot_wider unite
+#'
 plot_demand_l <- function(
   flows_l, time_breaks = NULL,
   point_alpha = .5, point_size = .75,
@@ -48,6 +51,10 @@ plot_demand_l <- function(
 #' Plot traffic demand over time, grouped by od pair.
 #'
 #' @param flows_od Trimmed flows$od tibble.
+#' @param time_breaks Breaks for scale_x_datetime
+#' @param point_alpha Alpha parameter of point layer
+#' @param point_size Size parameter of point layer
+#' @param line_size Size parameter of line layer
 #' @export
 plot_demand_od <- function(
   flows_od, time_breaks = NULL,
@@ -89,7 +96,16 @@ plot_demand_od <- function(
 #' Plot traffic speed over time, grouped by od pair.
 #'
 #' @param flows_od Trimmed flows$od tibble.
+#' @param time_breaks Breaks for scale_x_datetime
+#' @param point_alpha Alpha parameter of point layer
+#' @param point_size Size parameter of point layer
+#' @param add_ribbon Whether to add ribbon representing deviation from the mean
+#' @param ribbon_alpha Alpha parameter of ribbon layer
+#' @param ribbon_fill Fill parameter of ribbon layer
+#' @param line_size Size parameter of line layer
+#'
 #' @export
+#'
 plot_speed_od <- function(
   flows_od, time_breaks = NULL,
   point_alpha = .5, point_size = .75,
