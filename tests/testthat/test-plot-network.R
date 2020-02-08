@@ -63,6 +63,12 @@ p3c <- plot_small_network(flows_od_8am_slice,
 
 # Tests ----
 
+test_that("plot graph stops if multiple time steps", {
+  expect_error(
+    plot_small_network(flows_od),
+    regexp = "Input flow data must be summarised or windowed")
+})
+
 test_that("plot small network works", {
   vdiffr::expect_doppelganger(
     "small network 1 summarised a", p1a)

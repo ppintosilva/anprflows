@@ -28,13 +28,7 @@ plot_small_network <- function(
   node_label_nudge_x = 0
 ) {
 
-  if(has_name(flows_od, 't')) {
-    if(length(unique(flows_od$t)) > 1) {
-      stop(paste0(
-      "Input flow data must be summarised or windowed ",
-      "(length(unique(flows_od$t)) == 1)"))
-    }
-  }
+  stop_if_multiple_time_steps(flows_od)
 
   graph <-
     flows_od %>%

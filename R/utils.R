@@ -19,3 +19,18 @@ first_element_greater <- function(vec, number){
   el <- vec[vec > number][1]
   ifelse(is.na(el), vec[length(vec)], el)
 }
+
+
+#' Check whether time column exists and throw error
+#'
+#' @param flows_od OD flows tibble.
+stop_if_multiple_time_steps <- function(flows_od) {
+  # If column 't' exists it should have a single distinct value
+  if(tibble::has_name(flows_od, 't')) {
+    if(length(unique(flows_od$t)) > 1) {
+      stop(paste0(
+        "Input flow data must be summarised or windowed ",
+        "(length(unique(flows_od$t)) == 1)"))
+    }
+  }
+}
