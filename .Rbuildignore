@@ -1,2 +1,3 @@
 ^anprflows\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$
