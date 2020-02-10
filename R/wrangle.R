@@ -114,8 +114,7 @@ get_flows_od <- function(
       }
       else {
         select(., .data$o, .data$d, .data$flow_o_out, .data$flow,
-               .data$flow_d_in, .data$rate_o, .data$rate_d,
-               everything())
+               .data$flow_d_in, .data$rate_o, .data$rate_d)
       }
     } %>%
     ungroup()
