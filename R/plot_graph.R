@@ -51,7 +51,7 @@ plot_small_network <- function(
     ungroup() %>%
     {
       if(ignore_source_sink) {
-        filter(., o != "SOURCE", d != "SINK")
+        filter(., .data$o != "SOURCE", .data$d != "SINK")
       } else .
     } %>%
     {
@@ -63,7 +63,7 @@ plot_small_network <- function(
     } %>%
     {
       if(tibble::has_name(., 't')) {
-        select(., -t)
+        select(., -.data$t)
       } else .
     } %>%
     rename(from = o, to = d) %>%
