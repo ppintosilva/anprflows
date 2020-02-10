@@ -32,9 +32,9 @@ plot_small_network <- function(
   aes_edge_label = "flow",
   edge_angle_calc = 'along',
   edge_label_dodge = ggplot2::unit(2.5, 'mm'),
-  edge_arrow = arrow(length = ggplot2::unit(1.5, 'mm')),
-  edge_start_cap = circle(1, 'mm'),
-  edge_end_cap = circle(2, 'mm'),
+  edge_arrow = ggplot2::arrow(length = ggplot2::unit(1.5, 'mm')),
+  edge_start_cap = ggraph::circle(1, 'mm'),
+  edge_end_cap = ggraph::circle(2, 'mm'),
   edge_width = 1,
   edge_alpha = .75,
   node_size = 4,
@@ -66,7 +66,7 @@ plot_small_network <- function(
         select(., -.data$t)
       } else .
     } %>%
-    rename(from = o, to = d) %>%
+    rename(from = !!sym("o"), to = !!sym("d")) %>%
     tidygraph::as_tbl_graph()
 
   label_mapping <- ifelse(aes_edge_label != "", "label", "")
@@ -74,7 +74,7 @@ plot_small_network <- function(
   graph %>%
     ggraph(layout = graph_layout) +
     geom_edge_fan(
-      aes(
+      ggplot2::aes(
         color = !!sym(aes_edge_color),
         label = !!sym(label_mapping)
       ),
@@ -93,7 +93,7 @@ plot_small_network <- function(
     {
       if(aes_node_label != "") {
         geom_node_text(
-          aes(
+          ggplot2::aes(
             label = !!sym(aes_node_label)
           ),
           nudge_y = node_label_nudge_y,

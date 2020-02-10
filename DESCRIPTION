@@ -29,4 +29,5 @@ Imports:
     tibble,
     tidygraph,
     scales,
-    magrittr
+    magrittr,
+    ggplot2

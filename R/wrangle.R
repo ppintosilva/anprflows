@@ -88,7 +88,7 @@ get_flows_od <- function(
       inner_join(
         .,
         flows_l %>%
-          filter(.data$type == "out") %>% rename(flow_o_out = flow),
+          filter(.data$type == "out") %>% rename(flow_o_out = !!sym("flow")),
         by = join_by_o) %>%
         verify(nrow(.) == join_o)
     } %>%
@@ -98,7 +98,7 @@ get_flows_od <- function(
       inner_join(
         .,
         flows_l %>%
-          filter(.data$type == "in") %>% rename(flow_d_in = flow),
+          filter(.data$type == "in") %>% rename(flow_d_in = !!sym("flow")),
         by = join_by_d) %>%
         verify(nrow(.) == join_d)
     } %>%
@@ -322,6 +322,6 @@ top_flows <- function(
     } %>%
     # adding small epsilon to guarantee float comparison returns true for
     # values equal to pthreshold
-    filter(p_cumflow <= (.data$pthreshold + epsilon)) %>%
+    filter(.data$p_cumflow <= (.data$pthreshold + epsilon)) %>%
     select(-.data$pthreshold)
 }

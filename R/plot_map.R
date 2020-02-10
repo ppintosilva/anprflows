@@ -89,7 +89,7 @@ plot_map <- function(
       if(add_primary) {
         ggplot2::geom_sf(
           data = primary,
-          mapping = aes(geometry = .data$geometry),
+          mapping = ggplot2::aes(geometry = .data$geometry),
           color = color_primary,
           size = size_primary
         )
@@ -99,7 +99,7 @@ plot_map <- function(
       if(add_arterial) {
         ggplot2::geom_sf(
           data = arterial,
-          mapping = aes(geometry = .data$geometry),
+          mapping = ggplot2::aes(geometry = .data$geometry),
           color = color_arterial,
           size = size_primary
         )
@@ -109,7 +109,7 @@ plot_map <- function(
       if(add_paths & aes_color_flows == "") {
         ggplot2::geom_sf(
           data = pairs,
-          mapping = aes(geometry = .data$geometry),
+          mapping = ggplot2::aes(geometry = .data$geometry),
           color = color_paths,
           size = size_paths
         )
@@ -119,8 +119,9 @@ plot_map <- function(
       if(add_paths & aes_color_flows != "") {
         ggplot2::geom_sf(
           data = pairs,
-          mapping = aes(geometry = .data$geometry,
-                        color = !!sym(aes_color_flows)),
+          mapping = ggplot2::aes(
+            geometry = .data$geometry,
+            color = !!sym(aes_color_flows)),
           size = size_paths
         )
       }
@@ -129,8 +130,9 @@ plot_map <- function(
       if(add_locations) {
         ggplot2::geom_sf(
           data = locations,
-          mapping = aes(geometry = .data$geometry,
-                        fill = !!sym(aes_color_locations)),
+          mapping = ggplot2::aes(
+            geometry = .data$geometry,
+            fill = !!sym(aes_color_locations)),
           color = ifelse(aes_color_locations == "", color_locations, NA),
           size = size_locations
         )
@@ -142,7 +144,7 @@ plot_map <- function(
                                    name = "location")
       }
     } +
-    theme(
+    ggplot2::theme(
       panel.grid = ggplot2::element_blank(),
       axis.line = ggplot2::element_blank()
     )

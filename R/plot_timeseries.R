@@ -74,7 +74,7 @@ plot_demand_od <- function(
   # stopifnot(n_distinct_ods <= 10)
 
   flows_od %>%
-    unite("od", o, d, sep = "->") %>%
+      unite("od", .data$o, .data$d, sep = "->") %>%
     ggplot2::ggplot() +
     ggplot2::geom_line(
       ggplot2::aes(
