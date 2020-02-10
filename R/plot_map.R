@@ -76,20 +76,20 @@ plot_map <- function(
     pairs <-
       suppressWarnings(
         inner_join(
-          flows %>% filter(o != "SOURCE", d != "SINK"),
+          flows %>% filter(.data$o != "SOURCE", .data$d != "SINK"),
           spatial$pairs
         )
       )
   }
 
   # Plot time
-  ggplot() +
+  ggplot2::ggplot() +
     # primary network
     {
       if(add_primary) {
-        geom_sf(
+        ggplot2::geom_sf(
           data = primary,
-          mapping = aes(geometry = geometry),
+          mapping = aes(geometry = .data$geometry),
           color = color_primary,
           size = size_primary
         )
@@ -97,9 +97,9 @@ plot_map <- function(
     } +
     {
       if(add_arterial) {
-        geom_sf(
+        ggplot2::geom_sf(
           data = arterial,
-          mapping = aes(geometry = geometry),
+          mapping = aes(geometry = .data$geometry),
           color = color_arterial,
           size = size_primary
         )
@@ -107,10 +107,9 @@ plot_map <- function(
     } +
     {
       if(add_paths & aes_color_flows == "") {
-        geom_sf(
+        ggplot2::geom_sf(
           data = pairs,
-
-          mapping = aes(geometry = geometry),
+          mapping = aes(geometry = .data$geometry),
           color = color_paths,
           size = size_paths
         )
@@ -118,9 +117,9 @@ plot_map <- function(
     } +
     {
       if(add_paths & aes_color_flows != "") {
-        geom_sf(
+        ggplot2::geom_sf(
           data = pairs,
-          mapping = aes(geometry = geometry,
+          mapping = aes(geometry = .data$geometry,
                         color = !!sym(aes_color_flows)),
           size = size_paths
         )
@@ -128,9 +127,9 @@ plot_map <- function(
     } +
     {
       if(add_locations) {
-        geom_sf(
+        ggplot2::geom_sf(
           data = locations,
-          mapping = aes(geometry = geometry,
+          mapping = aes(geometry = .data$geometry,
                         fill = !!sym(aes_color_locations)),
           color = ifelse(aes_color_locations == "", color_locations, NA),
           size = size_locations
@@ -139,12 +138,12 @@ plot_map <- function(
     } +
     {
       if(aes_color_locations != "") {
-        scale_fill_brewer(palette = locations_palette, name = "location")
+        ggplot2::scale_fill_brewer(palette = locations_palette,
+                                   name = "location")
       }
     } +
     theme(
-      panel.grid = element_blank(),
-      axis.line = element_blank()
+      panel.grid = ggplot2::element_blank(),
+      axis.line = ggplot2::element_blank()
     )
-
 }
