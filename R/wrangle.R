@@ -6,30 +6,44 @@
 #'
 #' @export
 #'
-get_flows_l <- function(flows) {
+get_flows_l <- function(flows, by_period = TRUE) {
   in_flows <-
     flows %>%
-    group_by(d,t) %>%
+    {
+      if(by_period) group_by(.,d,t)
+      else group_by(.,d)
+    } %>%
     summarise(`in`= sum(flow)) %>%
     rename(l = d)
 
   out_flows <-
     flows %>%
-    group_by(o,t) %>%
+    {
+      if(by_period) group_by(.,o,t)
+      else group_by(.,o)
+    } %>%
     summarise(out = sum(flow)) %>%
     rename(l = o)
+
+  if(by_period)
+    join_by <- c("l" = "l", "t" = "t")
+  else
+    join_by <- c("l" = "l")
 
   full_join(
       in_flows,
       out_flows,
-      by = c("l" = "l", "t" = "t")
+      by = join_by
     ) %>%
     pivot_longer(
       cols = c("in", "out"),
       names_to = "type",
       values_to = "flow"
     ) %>%
-    arrange(l,t,type) %>%
+    {
+      if(by_period) arrange(.,l,t,type)
+      else arrange(.,l,type)
+    } %>%
     mutate(flow = replace_na(flow, 0)) %>%
     ungroup()
 }

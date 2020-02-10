@@ -122,3 +122,20 @@ test_that("top flows work", {
 
   expect_true(nrow(top30p_total) <= nrow(top30p))
 })
+
+test_that("asymptotic flows work", {
+  asympt_flows_l_1 <-
+    raw_flows_1 %>%
+    get_flows_l(by_period = FALSE)
+
+  expected_nrows <-
+    get_flows_l(raw_flows_1) %>%
+    distinct(l,type) %>%
+    nrow()
+
+  observed_nrows <-
+    asympt_flows_l_1 %>%
+    nrow()
+
+  expect_true(expected_nrows == observed_nrows)
+})
