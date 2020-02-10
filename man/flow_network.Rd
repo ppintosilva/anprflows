@@ -6,15 +6,18 @@
 \usage{
 flow_network(
   flows,
-  spurious_thresholds = c(rate_o = 0.1, rate_d = 0.1),
+  spurious_if_below = c(rate_o = 0.1, rate_d = 0.1),
   label_subgraphs = TRUE
 )
 }
 \arguments{
 \item{flows}{Asymptotic od flows}
 
-\item{spurious_thresholds}{Remove edges whose attributes are lower than
+\item{spurious_if_below}{Remove edges whose attributes are lower than
 the corresponding threshold.}
+
+\item{label_subgraphs}{Whether to label subgraphs as a result of removing
+spurious edges.}
 }
 \description{
 Create a tidygraph from flows and remove spurious edges in the process.

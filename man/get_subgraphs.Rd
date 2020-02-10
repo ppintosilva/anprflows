@@ -4,10 +4,13 @@
 \alias{get_subgraphs}
 \title{Label nodes according to the subgraph, if any, that they belong in.}
 \usage{
-get_subgraphs(network)
+get_subgraphs(network, ignore_source_sink = TRUE)
 }
 \arguments{
 \item{network}{A flow network}
+
+\item{ignore_source_sink}{Whether to ignore source and sink nodes in label
+calculation.}
 }
 \description{
 Label nodes according to the subgraph, if any, that they belong in.

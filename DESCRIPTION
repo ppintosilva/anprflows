@@ -30,4 +30,5 @@ Imports:
     tidygraph,
     scales,
     magrittr,
-    ggplot2
+    ggplot2,
+    igraph
