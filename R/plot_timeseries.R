@@ -22,30 +22,37 @@ plot_demand_l <- function(
       names_prefix = "flow.",
       names_from   = "type",
       values_from  = "flow") %>%
-    ggplot() +
-    geom_line(
-      aes(
-        x = t,
-        y = flow.out,
-        color = l
+    ggplot2::ggplot() +
+    ggplot2::geom_line(
+      ggplot2::aes(
+        x = .data$t,
+        y = .data$flow.out,
+        color = .data$l
       ),
       size = line_size
     ) +
-    geom_point(
-      aes(x = t, y = flow.out, color = l),
+    ggplot2::geom_point(
+      ggplot2::aes(
+        x = .data$t,
+        y = .data$flow.out,
+        color = .data$l
+      ),
       alpha = point_alpha,
       size = point_size
     ) +
     {
       if(is.null(time_breaks)) .
       else {
-        scale_x_datetime(
+        ggplot2::scale_x_datetime(
           breaks = time_breaks,
           labels = get_time_labels(time_breaks)
         )
       }
     } +
-    theme_bw()
+    ggplot2::xlab("Time") +
+    ggplot2::ylab("Flow (out)") +
+    ggplot2::labs(color = "Location") +
+    ggplot2::theme_bw()
 }
 
 #' Plot traffic demand over time, grouped by od pair.
@@ -68,29 +75,36 @@ plot_demand_od <- function(
 
   flows_od %>%
     unite("od", o, d, sep = "->") %>%
-    ggplot() +
-    geom_line(
-      aes(
-        x = t,
-        y = flow,
-        color = od
+    ggplot2::ggplot() +
+    ggplot2::geom_line(
+      ggplot2::aes(
+        x = .data$t,
+        y = .data$flow,
+        color = .data$od
       ),
       size = line_size
     ) +
-    geom_point(
-      aes(x = t, y = flow, color = od),
+    ggplot2::geom_point(
+      ggplot2::aes(
+        x = .data$t,
+        y = .data$flow,
+        color = .data$od
+      ),
       alpha = point_alpha,
       size = point_size
     ) +
     {
       if(!is.null(time_breaks)) {
-        scale_x_datetime(
+        ggplot2::scale_x_datetime(
           breaks = time_breaks,
           labels = get_time_labels(time_breaks)
         )
       }
     } +
-    theme_bw()
+    ggplot2::xlab("Time") +
+    ggplot2::ylab("Flow (out)") +
+    ggplot2::labs(color = "OD pair") +
+    ggplot2::theme_bw()
 }
 
 #' Plot traffic speed over time, grouped by od pair.
@@ -113,36 +127,36 @@ plot_speed_od <- function(
   line_size = .5
 ) {
   flows_od %>%
-    unite("od", o, d, sep = "->") %>%
-    filter(!is.na(mean_avspeed)) %>%
-    ggplot() +
+    unite("od", .data$o, .data$d, sep = "->") %>%
+    filter(!is.na(.data$mean_avspeed)) %>%
+    ggplot2::ggplot() +
     {
       if(add_ribbon) {
-        geom_ribbon(
-          aes(
-            x = t,
-            ymin = mean_avspeed - sd_avspeed,
-            ymax = mean_avspeed + sd_avspeed,
-            color = od
+        ggplot2::geom_ribbon(
+          ggplot2::aes(
+            x = .data$t,
+            ymin = .data$mean_avspeed - .data$sd_avspeed,
+            ymax = .data$mean_avspeed + .data$sd_avspeed,
+            color = .data$od
           ),
           fill = ribbon_fill,
-          linetype=0,
+          linetype = 0,
           alpha = ribbon_alpha
         )}
     } +
-    geom_line(
-      aes(
-        x = t,
-        y = mean_avspeed,
-        color = od
+    ggplot2::geom_line(
+      ggplot2::aes(
+        x = .data$t,
+        y = .data$mean_avspeed,
+        color = .data$od
         ),
       size = line_size
     ) +
-    geom_point(
-      aes(
-        x = t,
-        y = mean_avspeed,
-        color = od
+    ggplot2::geom_point(
+      ggplot2::aes(
+        x = .data$t,
+        y = .data$mean_avspeed,
+        color = .data$od
       ),
       alpha = point_alpha,
       size = point_size
@@ -150,12 +164,14 @@ plot_speed_od <- function(
     {
       if(is.null(time_breaks)) .
       else {
-        scale_x_datetime(
+        ggplot2::scale_x_datetime(
           breaks = time_breaks,
           labels = get_time_labels(time_breaks)
         )
       }
     } +
-    scale_y_continuous("Mean speed") +
-    theme_bw()
+    ggplot2::xlab("Time") +
+    ggplot2::ylab("Mean speed") +
+    ggplot2::labs(color = "OD pair") +
+    ggplot2::theme_bw()
 }
