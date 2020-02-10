@@ -7,7 +7,7 @@ NA_LOCATION <- 999999
 #' @param datetime_format Format of datetime column.
 #' @param ... Further parameters passed to read_csv
 #'
-#' @return A tibble containing "raw" flow data.
+#' @return 'Raw' flows [tibble][tibble::tibble-package]
 #'
 #' @export
 #'
@@ -15,7 +15,7 @@ read_flows_csv <- function(filenames,
                            datetime_format = '%Y-%m-%d %H:%M:%S',
                            ...)
 {
-  flows <- tidyr::tibble()
+  flows <- tibble()
 
   for (filename in filenames) {
     new_flows <- readr::read_csv(
@@ -41,10 +41,12 @@ read_flows_csv <- function(filenames,
   flows <-
     flows %>%
     dplyr::mutate(
-      o = forcats::fct_explicit_na(as.factor(dplyr::na_if(o, NA_LOCATION)),
-                                   na_level = "SOURCE"),
-      d = forcats::fct_explicit_na(as.factor(dplyr::na_if(d, NA_LOCATION)),
-                                   na_level = "SINK")
+      o = forcats::fct_explicit_na(
+            as.factor(dplyr::na_if(.data$o, NA_LOCATION)),
+            na_level = "SOURCE"),
+      d = forcats::fct_explicit_na(
+            as.factor(dplyr::na_if(.data$d, NA_LOCATION)),
+            na_level = "SINK")
     )
 
   # Union of factor levels from origin and destination columns in case
@@ -55,8 +57,8 @@ read_flows_csv <- function(filenames,
   flows <-
     flows %>%
     dplyr::mutate(
-      o = factor(o, levels = llevels),
-      d = factor(d, levels = llevels)
+      o = factor(.data$o, levels = llevels),
+      d = factor(.data$d, levels = llevels)
     )
 
   return(flows)

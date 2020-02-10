@@ -14,7 +14,7 @@ read_flows_csv(filenames, datetime_format = "\%Y-\%m-\%d \%H:\%M:\%S", ...)
 \item{...}{Further parameters passed to read_csv}
 }
 \value{
-A tibble containing "raw" flow data.
+'Raw' flows [tibble][tibble::tibble-package]
 }
 \description{
 Read one or more flows csv files into R
