@@ -4,7 +4,11 @@
 \alias{flow_network}
 \title{Create a tidygraph from flows and remove spurious edges in the process.}
 \usage{
-flow_network(flows, spurious_thresholds = c(rate_o = 0.1, rate_d = 0.1))
+flow_network(
+  flows,
+  spurious_thresholds = c(rate_o = 0.1, rate_d = 0.1),
+  label_subgraphs = TRUE
+)
 }
 \arguments{
 \item{flows}{Asymptotic od flows}
