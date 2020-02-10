@@ -1,6 +1,7 @@
 #' Calculate flows at all unique locations of the road network
 #'
 #' @param flows A 'raw' flows dataset.
+#' @param by_period Whether to group data by time or not.
 #'
 #' @return flows_l [tibble][tibble::tibble-package]
 #'
@@ -52,37 +53,67 @@ get_flows_l <- function(flows, by_period = TRUE) {
 #'
 #' @param flows A 'raw' flows dataset.
 #' @param flows_l Flows at unique locations
+#' @param by_period Whether to group data by time or not.
 #'
 #' @return flows_od [tibble][tibble::tibble-package]
 #'
 #' @export
 #'
-get_flows_od <- function(flows, flows_l) {
+get_flows_od <- function(
+  flows, flows_l,
+  by_period = TRUE
+) {
+  if(!by_period) {
+    stop_if_multiple_time_steps(flows_l)
+
+    join_by_o <- c("o" = "l")
+    join_by_d <- c("d" = "l")
+
+    flows <-
+      flows %>%
+      group_by(o,d) %>%
+      #summary_expr Summary expression applied when by_period is FALSE
+      summarise(
+        flow = sum(flow)
+      )
+  } else {
+    join_by_o <- c("o" = "l", "t" = "t")
+    join_by_d <- c("d" = "l", "t" = "t")
+  }
+
   flows %>%
     {
-      {nrow(.) -> join2}
+      {nrow(.) -> join_o}
       # total flow coming out of origin
       inner_join(
         .,
         flows_l %>% filter(type == "out") %>% rename(flow_o_out = flow),
-        by = c("o" = "l", "t" = "t")) %>%
-        verify(nrow(.) == join2)
+        by = join_by_o) %>%
+        verify(nrow(.) == join_o)
     } %>%
     {
-      {nrow(.) -> join3}
+      {nrow(.) -> join_d}
       # total flow entering destination
       inner_join(
         .,
         flows_l %>% filter(type == "in") %>% rename(flow_d_in = flow),
-        by = c("d" = "l", "t" = "t")) %>%
-        verify(nrow(.) == join3)
+        by = join_by_d) %>%
+        verify(nrow(.) == join_d)
     } %>%
     mutate(
       rate_o = flow / flow_o_out,
       rate_d = flow / flow_d_in
     ) %>%
-    select(o, d, t, flow_o_out, flow, flow_d_in, rate_o, rate_d,
-           median_speed, mean_speed, sd_speed) %>%
+    {
+      if(by_period) {
+        select(., o, d, t, flow_o_out, flow, flow_d_in, rate_o, rate_d,
+               median_speed, mean_speed, sd_speed)
+      }
+      else {
+        select(., o, d, flow_o_out, flow, flow_d_in, rate_o, rate_d,
+               everything())
+      }
+    } %>%
     ungroup()
 }
 

@@ -4,12 +4,14 @@
 \alias{get_flows_od}
 \title{Calculate flow rates for all OD pairs in the road network}
 \usage{
-get_flows_od(flows, flows_l)
+get_flows_od(flows, flows_l, by_period = TRUE)
 }
 \arguments{
 \item{flows}{A 'raw' flows dataset.}
 
 \item{flows_l}{Flows at unique locations}
+
+\item{by_period}{Whether to group data by time or not.}
 }
 \value{
 flows_od [tibble][tibble::tibble-package]

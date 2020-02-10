@@ -4,10 +4,12 @@
 \alias{get_flows_l}
 \title{Calculate flows at all unique locations of the road network}
 \usage{
-get_flows_l(flows)
+get_flows_l(flows, by_period = TRUE)
 }
 \arguments{
 \item{flows}{A 'raw' flows dataset.}
+
+\item{by_period}{Whether to group data by time or not.}
 }
 \value{
 flows_l [tibble][tibble::tibble-package]

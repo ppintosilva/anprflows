@@ -123,7 +123,7 @@ test_that("top flows work", {
   expect_true(nrow(top30p_total) <= nrow(top30p))
 })
 
-test_that("asymptotic flows work", {
+test_that("asymptotic flows_l work", {
   asympt_flows_l_1 <-
     raw_flows_1 %>%
     get_flows_l(by_period = FALSE)
@@ -135,6 +135,32 @@ test_that("asymptotic flows work", {
 
   observed_nrows <-
     asympt_flows_l_1 %>%
+    nrow()
+
+  expect_true(expected_nrows == observed_nrows)
+})
+
+test_that("asymptotic flows_od work", {
+  asympt_flows_l_1 <-
+    raw_flows_1 %>%
+    get_flows_l(by_period = FALSE)
+
+  # if we couple raw_flows with asympt_flows_l then we should get an error
+  expect_error(
+    get_flows_od(raw_flows_od_1, asympt_flows_l_1, by_period = TRUE)
+  )
+
+  asympt_flows_od_1 <-
+    raw_flows_1 %>%
+    get_flows_od(asympt_flows_l_1, by_period = FALSE)
+
+  expected_nrows <-
+    get_flows_od(raw_flows_1, get_flows_l(raw_flows_1)) %>%
+    distinct(o,d) %>%
+    nrow()
+
+  observed_nrows <-
+    asympt_flows_od_1 %>%
     nrow()
 
   expect_true(expected_nrows == observed_nrows)
