@@ -2,6 +2,7 @@
 
 export("%>%")
 export(crop_spatial)
+export(flow_network)
 export(get_flows_l)
 export(get_flows_od)
 export(get_total_flow)
