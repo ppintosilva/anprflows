@@ -57,3 +57,45 @@ test_that("flow network with two subgraphs is labelled correctly", {
 
   expect_equal(subgraphs, c(1,2,NA))
 })
+
+test_that("get neighbors from network works", {
+
+  subnetwork209 <-
+    get_neighbors(G, "209")
+
+  expect_equal(
+    subnetwork209 %>%
+      activate(nodes) %>%
+      as_tibble() %>%
+      pull(name),
+    c("54", "77", "209", "SOURCE")
+  )
+
+  expect_equal(
+    subnetwork209 %>%
+      activate(edges) %>%
+      as_tibble() %>%
+      select(from, to),
+    tibble("from" = as.integer(c(2,3,4,4)),
+           "to" = as.integer(c(3,1,2,3)))
+  )
+
+  subnetwork54 <-
+    get_neighbors(G, "54")
+
+  expect_equal(
+    subnetwork54 %>%
+      activate(nodes) %>%
+      as_tibble() %>%
+      pull(name),
+    c("54", "209", "SINK")
+  )
+
+  subnetwork_209_54 <-
+    get_neighbors(G, c("209", "54"))
+
+  expect_equal(
+    subnetwork_209_54 %>% activate("edges") %>% as_tibble() %>% select(from,to),
+    G1 %>% activate("edges") %>% as_tibble() %>% select(from,to)
+  )
+})

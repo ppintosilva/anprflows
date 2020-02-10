@@ -74,3 +74,41 @@ get_subgraphs <- function(network, ignore_source_sink = TRUE) {
                         NA, .data$subgraph)
     )
 }
+
+
+#' Get the subset of the flow network which contains all nodes that are
+#' neighbors to a list of nodes.
+#'
+#'
+#' @param network Flow network
+#' @param nodes Character vector of node names
+#'
+#' @export
+#'
+get_neighbors <- function(
+  network, nodes
+) {
+  # Get neighbors of each node as a list
+  neighbors <-
+    nodes %>%
+    lapply(
+      function(x) igraph::neighbors(network, x, "all")
+    )
+
+  # Union of all neighbors
+  all_nodes <- do.call(igraph::union, c(neighbors))
+
+  # append the original nodes
+  all_nodes <- igraph::union(
+    all_nodes,
+    igraph::V(network)[igraph::V(network)$name %in% nodes]
+  )
+
+  # get graph that contains these nodes
+  igraph::induced_subgraph(
+    network,
+    all_nodes,
+    impl = 'copy_and_delete'
+  ) %>%
+    as_tbl_graph()
+}
