@@ -11,20 +11,20 @@ get_flows_l <- function(flows, by_period = TRUE) {
   in_flows <-
     flows %>%
     {
-      if(by_period) group_by(.,d,t)
-      else group_by(.,d)
+      if(by_period) group_by(., .data$d, .data$t)
+      else group_by(., .data$d)
     } %>%
-    summarise(`in`= sum(flow)) %>%
-    rename(l = d)
+    summarise(`in`= sum(.data$flow)) %>%
+    rename(l = .data$d)
 
   out_flows <-
     flows %>%
     {
-      if(by_period) group_by(.,o,t)
-      else group_by(.,o)
+      if(by_period) group_by(., .data$o, .data$t)
+      else group_by(., .data$o)
     } %>%
-    summarise(out = sum(flow)) %>%
-    rename(l = o)
+    summarise(out = sum(.data$flow)) %>%
+    rename(l = .data$o)
 
   if(by_period)
     join_by <- c("l" = "l", "t" = "t")
@@ -42,10 +42,10 @@ get_flows_l <- function(flows, by_period = TRUE) {
       values_to = "flow"
     ) %>%
     {
-      if(by_period) arrange(.,l,t,type)
-      else arrange(.,l,type)
+      if(by_period) arrange(., .data$l, .data$t, .data$type)
+      else arrange(., .data$l, .data$type)
     } %>%
-    mutate(flow = replace_na(flow, 0)) %>%
+    mutate(flow = replace_na(.data$flow, 0)) %>%
     ungroup()
 }
 
@@ -71,10 +71,10 @@ get_flows_od <- function(
 
     flows <-
       flows %>%
-      group_by(o,d) %>%
+      group_by(.data$o, .data$d) %>%
       #summary_expr Summary expression applied when by_period is FALSE
       summarise(
-        flow = sum(flow)
+        flow = sum(.data$flow)
       )
   } else {
     join_by_o <- c("o" = "l", "t" = "t")
@@ -87,7 +87,8 @@ get_flows_od <- function(
       # total flow coming out of origin
       inner_join(
         .,
-        flows_l %>% filter(type == "out") %>% rename(flow_o_out = flow),
+        flows_l %>%
+          filter(.data$type == "out") %>% rename(flow_o_out = flow),
         by = join_by_o) %>%
         verify(nrow(.) == join_o)
     } %>%
@@ -96,21 +97,24 @@ get_flows_od <- function(
       # total flow entering destination
       inner_join(
         .,
-        flows_l %>% filter(type == "in") %>% rename(flow_d_in = flow),
+        flows_l %>%
+          filter(.data$type == "in") %>% rename(flow_d_in = flow),
         by = join_by_d) %>%
         verify(nrow(.) == join_d)
     } %>%
     mutate(
-      rate_o = flow / flow_o_out,
-      rate_d = flow / flow_d_in
+      rate_o = .data$flow / .data$flow_o_out,
+      rate_d = .data$flow / .data$flow_d_in
     ) %>%
     {
       if(by_period) {
-        select(., o, d, t, flow_o_out, flow, flow_d_in, rate_o, rate_d,
-               median_speed, mean_speed, sd_speed)
+        select(., .data$o, .data$d, .data$t, .data$flow_o_out, .data$flow,
+               .data$flow_d_in, .data$rate_o, .data$rate_d,
+               .data$median_speed, .data$mean_speed, .data$sd_speed)
       }
       else {
-        select(., o, d, flow_o_out, flow, flow_d_in, rate_o, rate_d,
+        select(., .data$o, .data$d, .data$flow_o_out, .data$flow,
+               .data$flow_d_in, .data$rate_o, .data$rate_d,
                everything())
       }
     } %>%
@@ -137,20 +141,20 @@ crop_spatial <- function(
   # get unique locations observed in the data
   observed_locations <-
     union(
-      flows_od %>% distinct(o) %>% pull(o),
-      flows_od %>% distinct(d) %>% pull(d)
+      flows_od %>% distinct(.data$o) %>% pull(.data$o),
+      flows_od %>% distinct(.data$d) %>% pull(.data$d)
     )
 
   # subset locations by existing flows
   locations <-
     spatial$locations %>%
-    filter(id %in% observed_locations)
+    filter(.data$id %in% observed_locations)
 
   # od combinations
   od_combinations <-
     flows_od %>%
-    filter(o != "SOURCE", d != "SINK") %>%
-    distinct(o,d)
+    filter(.data$o != "SOURCE", .data$d != "SINK") %>%
+    distinct(.data$o, .data$d)
 
   pairs <-
     suppressWarnings(
@@ -165,8 +169,8 @@ crop_spatial <- function(
   # intersection primary and arterial with flows (zoom in)
   bbox <-
     flows_od %>%
-    filter(o != "SOURCE", d != "SINK") %>%
-    pull(geometry) %>%
+    filter(.data$o != "SOURCE", .data$d != "SINK") %>%
+    pull(.data$geometry) %>%
     sf::st_bbox() +
     bbox_margin
 
@@ -182,7 +186,7 @@ crop_spatial <- function(
     arterial %>%
     {
       if(!is.null(arterial_highway))
-        filter(., highway == arterial_highway)
+        filter(., .data$highway == arterial_highway)
     }
 
   # looking for primary network data in
@@ -225,13 +229,13 @@ get_total_flow <- function(
   flows_od %>%
     {
       if(ignore_sink_source) {
-        filter(., o != "SOURCE", d != "SINK")
+        filter(., .data$o != "SOURCE", .data$d != "SINK")
       } else .
     } %>%
     {
       if(by_period) {
-        group_by(.,t) %>%
-          summarise(total_flow = sum(flow))
+        group_by(., .data$t) %>%
+          summarise(total_flow = sum(.data$flow))
       } else {
         sum(.$flow)
       }
@@ -264,17 +268,19 @@ top_flows <- function(
     flows_od %>%
     {
       if(ignore_sink_source) {
-        filter(., o != "SOURCE", d != "SINK")
+        filter(., .data$o != "SOURCE", .data$d != "SINK")
       } else .
     } %>%
     {
       if(by_period) {
-        group_by(.,t)
+        group_by(., .data$t)
       } else {
-        group_by(.,o,d) %>% summarise(flow = sum(flow)) %>% ungroup()
+        group_by(., .data$o, .data$d) %>%
+          summarise(flow = sum(.data$flow)) %>%
+          ungroup()
       }
     } %>%
-    arrange(desc(flow)) %>%
+    arrange(desc(.data$flow)) %>%
     {
       if(by_period) {
         {nrow(.) -> expected_rows}
@@ -285,18 +291,19 @@ top_flows <- function(
         verify(nrow(.) == expected_rows)
       } else .
     } %>%
-    mutate(p_cumflow = cumsum(flow)/total_flow)
+    mutate(p_cumflow = cumsum(.data$flow)/total_flow)
 
   # return nearest p_cumflow that is greater than p
   threshold <-
     cumflows %>%
     {
       if(by_period) {
-        group_by(.,t) %>%
-        summarise(pthreshold = first_element_greater(p_cumflow, p))
+        group_by(., .data$t) %>%
+        summarise(pthreshold = first_element_greater(.data$p_cumflow, p))
       }
       else {
-        summarise(., elem = first_element_greater(p_cumflow, p)) %>% pull(elem)
+        summarise(., elem = first_element_greater(.data$p_cumflow, p)) %>%
+          pull(.data$elem)
       }
     }
 
@@ -315,6 +322,6 @@ top_flows <- function(
     } %>%
     # adding small epsilon to guarantee float comparison returns true for
     # values equal to pthreshold
-    filter(p_cumflow <= (pthreshold + epsilon)) %>%
-    select(-pthreshold)
+    filter(p_cumflow <= (.data$pthreshold + epsilon)) %>%
+    select(-.data$pthreshold)
 }
