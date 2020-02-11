@@ -164,10 +164,9 @@ crop_spatial <- function(
       )
     )
 
-
   # intersection primary and arterial with flows (zoom in)
   bbox <-
-    flows_od %>%
+    pairs %>%
     filter(.data$o != "SOURCE", .data$d != "SINK") %>%
     pull(.data$geometry) %>%
     sf::st_bbox() +
