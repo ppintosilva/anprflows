@@ -88,6 +88,20 @@ get_subgraphs <- function(network, ignore_source_sink = TRUE) {
 get_neighbors <- function(
   network, nodes
 ) {
+  # warning: removing nodes from input list if not present in graph
+  network_nodes <-
+    network %>% tidygraph::activate("nodes") %>%
+    as_tibble() %>% pull(name)
+
+  node_diff <- setdiff(nodes, network_nodes)
+  if(length(node_diff) > 0) {
+    warning(paste0("Ignoring nodes ", node_diff,
+                   " which can not be found in the network."))
+    nodes <- setdiff(nodes, node_diff)
+  }
+
+  stopifnot(length(nodes) > 0)
+
   # Get neighbors of each node as a list
   neighbors <-
     nodes %>%

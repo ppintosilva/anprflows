@@ -99,3 +99,24 @@ test_that("get neighbors from network works", {
     G1 %>% activate("edges") %>% as_tibble() %>% select(from,to)
   )
 })
+
+test_that("flow network with two subgraphs is labelled correctly", {
+
+  subgraphs <-
+    G %>%
+    activate(nodes) %>%
+    as_tibble() %>%
+    distinct(subgraph) %>%
+    pull(subgraph)
+
+  expect_equal(subgraphs, c(1,2,NA))
+})
+
+test_that("get neighbors from network works", {
+
+  subnetwork209 <-
+    get_neighbors(G, "209")
+
+  expect_warning(get_neighbors(G, c("209", "10000")),
+                 regexp = "Ignoring nodes")
+})
