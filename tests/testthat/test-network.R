@@ -67,7 +67,8 @@ test_that("get neighbors from network works", {
     subnetwork209 %>%
       activate(nodes) %>%
       as_tibble() %>%
-      pull(name),
+      pull(name) %>%
+      as.character(),
     c("54", "77", "209", "SOURCE")
   )
 
@@ -87,7 +88,8 @@ test_that("get neighbors from network works", {
     subnetwork54 %>%
       activate(nodes) %>%
       as_tibble() %>%
-      pull(name),
+      pull(name) %>%
+      as.character(),
     c("54", "209", "SINK")
   )
 

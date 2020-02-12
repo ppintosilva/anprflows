@@ -2,7 +2,7 @@
 % Please edit documentation in R/network.R
 \name{get_subgraphs}
 \alias{get_subgraphs}
-\title{Label nodes according to the subgraph, if any, that they belong in.}
+\title{Label nodes according to the subgraph, if any, which they belong in.}
 \usage{
 get_subgraphs(network, ignore_source_sink = TRUE)
 }
@@ -12,6 +12,9 @@ get_subgraphs(network, ignore_source_sink = TRUE)
 \item{ignore_source_sink}{Whether to ignore source and sink nodes in label
 calculation.}
 }
+\value{
+[tbl_graph]
+}
 \description{
-Label nodes according to the subgraph, if any, that they belong in.
+Label nodes according to the subgraph, if any, which they belong in.
 }

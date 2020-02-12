@@ -5,13 +5,22 @@
 #' the corresponding threshold.
 #' @param label_subgraphs Whether to label subgraphs as a result of removing
 #' spurious edges.
+#' @param subgraphs_ignore_source_sink Whether to ignore source and sink
+#' nodes in label calculation.
+#' @param names_as_factors Whether to convert node names to factor.
+#' @param node_levels Optionally set the levels of node factor.
+#'
+#' @return [tbl_graph]
 #'
 #' @export
 #'
 flow_network <- function(
   flows,
   spurious_if_below = c("rate_o" = .1, "rate_d" = .1),
-  label_subgraphs = TRUE
+  label_subgraphs = TRUE,
+  subgraphs_ignore_source_sink = TRUE,
+  names_as_factors = TRUE,
+  node_levels = NULL
 ) {
 
   # If column 't' exists it should have a single distinct value
@@ -35,23 +44,33 @@ flow_network <- function(
 
   filtered_flows %>%
     as_tbl_graph() %>%
+    activate("nodes") %>%
     {
       if(label_subgraphs) {
-        activate(., "nodes") %>%
-          left_join(
-            get_subgraphs(.),
-            by = c("name" = "name")
-          )
+        left_join(
+          .,
+          get_subgraphs(., subgraphs_ignore_source_sink),
+          by = c("name" = "name")
+        )
+      }
+    } %>%
+    {
+      if(names_as_factors & !is.null(node_levels)) {
+        mutate(., name = factor(.data$name, levels = node_levels))
+      } else if(names_as_factors) {
+        mutate(., name = factor(.data$name))
       }
     }
 }
 
 
-#' Label nodes according to the subgraph, if any, that they belong in.
+#' Label nodes according to the subgraph, if any, which they belong in.
 #'
 #' @param network A flow network
 #' @param ignore_source_sink Whether to ignore source and sink nodes in label
 #' calculation.
+#'
+#' @return [tbl_graph]
 #'
 #' @export
 #'
