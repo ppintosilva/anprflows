@@ -6,7 +6,7 @@
 #' @importFrom dplyr bind_rows sym if_else left_join
 #' @importFrom tidyr pivot_longer pivot_wider replace_na
 #' @importFrom tidygraph as_tbl_graph activate
-#' @importFrom ggraph ggraph geom_edge_fan geom_node_point geom_node_text
+#' @importFrom ggraph ggraph geom_edge_fan geom_node_label
 #' @importFrom stats setNames
 #' @importFrom utils tail
 ## usethis namespace: end

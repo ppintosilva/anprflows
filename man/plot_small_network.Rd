@@ -14,16 +14,16 @@ plot_small_network(
   aes_edge_label = "flow",
   edge_angle_calc = "along",
   edge_label_dodge = ggplot2::unit(2.5, "mm"),
-  edge_arrow = ggplot2::arrow(length = ggplot2::unit(1.5, "mm")),
-  edge_start_cap = ggraph::circle(1, "mm"),
-  edge_end_cap = ggraph::circle(2, "mm"),
+  edge_arrow = ggplot2::arrow(length = ggplot2::unit(3, "mm")),
+  edge_start_cap = ggraph::circle(5, "mm"),
+  edge_end_cap = ggraph::circle(5, "mm"),
   edge_width = 1,
   edge_alpha = 0.75,
-  node_size = 4,
-  node_color = munsell::mnsl("5BG 6/4"),
+  label_size = 5,
   aes_node_label = "name",
-  node_label_nudge_y = 0.1,
-  node_label_nudge_x = 0
+  aes_node_fill = "name",
+  node_label_color = "black",
+  node_label_palette = "Set2"
 )
 }
 \arguments{
@@ -55,15 +55,15 @@ plot_small_network(
 
 \item{edge_alpha}{Edge alpha}
 
-\item{node_size}{Node size}
+\item{label_size}{Node label size}
 
-\item{node_color}{Node color}
+\item{aes_node_label}{Label nodes aesthetic}
 
-\item{aes_node_label}{Optionally label nodes according to this aesthetic}
+\item{aes_node_fill}{Fill nodes aesthetic}
 
-\item{node_label_nudge_y}{Shift amount applied node labels on the y axis}
+\item{node_label_color}{Font color of node labels}
 
-\item{node_label_nudge_x}{Shift amount applied node labels on the x axis}
+\item{node_label_palette}{Fill color brewer palette}
 }
 \description{
 Plot flow network.

@@ -97,11 +97,4 @@ test_that("plot small network works", {
     "small network 3 slice b", p3b)
   vdiffr::expect_doppelganger(
     "small network 3 slice c",p3c)
-
-  vdiffr::expect_doppelganger(
-    "small network 2 raw slice a plus geom point",
-    p2a +
-      geom_node_point(aes(color = factor(name)), size = 4) +
-      scale_color_brewer("name", palette = "Set2")
-  )
 })
