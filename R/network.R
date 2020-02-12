@@ -17,6 +17,10 @@ flow_network <- function(
   # If column 't' exists it should have a single distinct value
   stop_if_multiple_time_steps(flows)
 
+  if(has_name(flows, 't')) {
+    flows <- flows %>% select(-t)
+  }
+
   if(!is.null(spurious_if_below)) {
     filtered_flows <-
       lapply(
@@ -91,7 +95,7 @@ get_neighbors <- function(
   # warning: removing nodes from input list if not present in graph
   network_nodes <-
     network %>% tidygraph::activate("nodes") %>%
-    as_tibble() %>% pull(name)
+    as_tibble() %>% pull(.data$name)
 
   node_diff <- setdiff(nodes, network_nodes)
   if(length(node_diff) > 0) {

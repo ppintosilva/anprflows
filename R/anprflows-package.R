@@ -1,5 +1,5 @@
 ## usethis namespace: start
-#' @importFrom tibble tibble as_tibble
+#' @importFrom tibble tibble as_tibble has_name
 #' @importFrom assertr verify
 #' @importFrom dplyr select arrange filter rename mutate group_by ungroup desc
 #' @importFrom dplyr distinct pull summarise inner_join full_join everything

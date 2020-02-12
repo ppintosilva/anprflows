@@ -5,7 +5,7 @@
 \title{Plot flow network.}
 \usage{
 plot_small_network(
-  flows_od,
+  network,
   ignore_source_sink = FALSE,
   num_accuracy = 0.1,
   num_scale = 1,
@@ -27,7 +27,7 @@ plot_small_network(
 )
 }
 \arguments{
-\item{flows_od}{Summarised or windowed od flows tibble.}
+\item{network}{Flow network.}
 
 \item{ignore_source_sink}{Whether to ignore source and sink nodes.}
 

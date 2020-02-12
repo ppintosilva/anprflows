@@ -1,6 +1,6 @@
 #' Plot flow network.
 #'
-#' @param flows_od Summarised or windowed od flows tibble.
+#' @param network Flow network.
 #' @param ignore_source_sink Whether to ignore source and sink nodes.
 #' @param num_accuracy Number format accuracy of edge labels.
 #' @param num_scale Multiplicative factor applied to edge labels.
@@ -23,7 +23,7 @@
 #' @export
 #'
 plot_small_network <- function(
-  flows_od,
+  network,
   ignore_source_sink = FALSE,
   num_accuracy = .1,
   num_scale = 1,
@@ -44,34 +44,27 @@ plot_small_network <- function(
   node_label_nudge_x = 0
 ) {
 
-  stop_if_multiple_time_steps(flows_od)
+  stopifnot("tbl_graph" %in% (class(network)))
 
-  graph <-
-    flows_od %>%
-    ungroup() %>%
-    {
-      if(ignore_source_sink) {
-        filter(., .data$o != "SOURCE", .data$d != "SINK")
-      } else .
-    } %>%
-    {
-      if(aes_edge_label != "") {
-        mutate(., label = scales::number(!!sym(aes_edge_label),
-                                         accuracy = num_accuracy,
-                                         scale = num_scale))
-      } else .
-    } %>%
-    {
-      if(tibble::has_name(., 't')) {
-        select(., -.data$t)
-      } else .
-    } %>%
-    rename(from = !!sym("o"), to = !!sym("d")) %>%
-    tidygraph::as_tbl_graph()
+  if(ignore_source_sink) {
+    network <-
+      network %>%
+      igraph::delete_vertices(c("SOURCE", "SINK")) %>%
+      as_tbl_graph()
+  }
+
+  if(aes_edge_label != "") {
+    network <-
+      network %>%
+      activate("edges") %>%
+      mutate(label = scales::number(!!sym(aes_edge_label),
+                                    accuracy = num_accuracy,
+                                    scale = num_scale))
+  }
 
   label_mapping <- ifelse(aes_edge_label != "", "label", "")
 
-  graph %>%
+  network %>%
     ggraph(layout = graph_layout) +
     geom_edge_fan(
       ggplot2::aes(

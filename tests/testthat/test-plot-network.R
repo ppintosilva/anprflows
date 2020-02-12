@@ -10,16 +10,27 @@ spatial1_filename <-
 
 raw_flows <- read_flows_csv(filenames = test1_filename)
 
+no_spurious <- NULL
+
 # summary of raw flows
 summarised_raw_flows <-
   raw_flows %>%
   dplyr::group_by(o,d) %>%
   dplyr::summarise(flow = sum(flow))
 
+network_summarised_raw <-
+  flow_network(flows = summarised_raw_flows,
+               spurious_if_below = no_spurious)
+
+
 # one time slice of raw flows
 raw_flows_8am_slice <-
   raw_flows %>%
   dplyr::filter(lubridate::hour(t) == 8 & lubridate::minute(t) == 15)
+
+network_raw_8am <-
+  flow_network(flows = raw_flows_8am_slice,
+               spurious_if_below = no_spurious)
 
 # processed flows
 flows_l <- get_flows_l(raw_flows)
@@ -30,34 +41,37 @@ flows_od_8am_slice <-
   flows_od %>%
   dplyr::filter(lubridate::hour(t) == 8 & lubridate::minute(t) == 15)
 
+network_processed_8am <-
+  flow_network(flows = flows_od_8am_slice,
+               spurious_if_below = no_spurious)
 
 # Plots ----
 
-p1a <- plot_small_network(summarised_raw_flows,
+p1a <- plot_small_network(network_summarised_raw,
                           num_scale = 0.001,
                           ignore_source_sink = TRUE)
 
-p1b <- plot_small_network(summarised_raw_flows,
+p1b <- plot_small_network(network_summarised_raw,
                           num_accuracy = NULL,
                           aes_edge_label = "flow",
                           aes_edge_color = "flow")
 
-p2a <- plot_small_network(raw_flows_8am_slice,
+p2a <- plot_small_network(network_raw_8am,
                           ignore_source_sink = TRUE)
 
-p2b <- plot_small_network(raw_flows_8am_slice,
+p2b <- plot_small_network(network_raw_8am,
                           aes_edge_color = "flow")
 
-p3a <- plot_small_network(flows_od_8am_slice,
+p3a <- plot_small_network(network_processed_8am,
                           aes_edge_color = "rate_o",
                           aes_edge_label = "rate_o",
                           num_accuracy = .01)
 
-p3b <- plot_small_network(flows_od_8am_slice,
+p3b <- plot_small_network(network_processed_8am,
                           aes_edge_label = "rate_d",
                           num_accuracy = .01)
 
-p3c <- plot_small_network(flows_od_8am_slice,
+p3c <- plot_small_network(network_processed_8am,
                           aes_edge_label = "",
                           aes_edge_color = "rate_d")
 
@@ -65,8 +79,7 @@ p3c <- plot_small_network(flows_od_8am_slice,
 
 test_that("plot graph stops if multiple time steps", {
   expect_error(
-    plot_small_network(flows_od),
-    regexp = "Input flow data must be summarised or windowed")
+    plot_small_network(flows_od))
 })
 
 test_that("plot small network works", {
