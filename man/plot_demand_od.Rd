@@ -9,7 +9,8 @@ plot_demand_od(
   time_breaks = NULL,
   point_alpha = 0.5,
   point_size = 0.75,
-  line_size = 0.5
+  line_size = 0.5,
+  include_source_sink = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,9 @@ plot_demand_od(
 \item{point_size}{Size parameter of point layer}
 
 \item{line_size}{Size parameter of line layer}
+
+\item{include_source_sink}{Include or exclude edges from source or to sink
+nodes.}
 }
 \description{
 Plot traffic demand over time, grouped by od pair.

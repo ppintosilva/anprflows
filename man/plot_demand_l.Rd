@@ -9,7 +9,9 @@ plot_demand_l(
   time_breaks = NULL,
   point_alpha = 0.5,
   point_size = 0.75,
-  line_size = 0.5
+  line_size = 0.5,
+  out_flow = TRUE,
+  include_source_sink = FALSE
 )
 }
 \arguments{
@@ -22,6 +24,11 @@ plot_demand_l(
 \item{point_size}{Size parameter of point layer}
 
 \item{line_size}{Size parameter of line layer}
+
+\item{out_flow}{Whether to plot outgoing or incoming flow}
+
+\item{include_source_sink}{Whether to include either source or sink nodes
+in graph depending on out or incoming flow.}
 }
 \description{
 Plot traffic demand over time, grouped by location.
