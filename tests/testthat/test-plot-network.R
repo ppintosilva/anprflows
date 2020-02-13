@@ -75,7 +75,7 @@ p3c <- plot_small_network(network_processed_8am,
                           aes_edge_label = "",
                           aes_edge_color = "rate_d")
 
-# Tests ----
+# Tests 1 ----
 
 test_that("plot graph stops if multiple time steps", {
   expect_error(
@@ -96,5 +96,57 @@ test_that("plot small network works", {
   vdiffr::expect_doppelganger(
     "small network 3 slice b", p3b)
   vdiffr::expect_doppelganger(
-    "small network 3 slice c",p3c)
+    "small network 3 slice c", p3c)
+})
+
+# Tests 2 ----
+
+test2_filename <-
+  system.file("testdata","small_flows_dataset_set2.csv", package="anprflows")
+
+# Both flows together
+raw_flows   <-
+  read_flows_csv(filenames = c(test1_filename,test2_filename)) %>%
+  dplyr::arrange(o,d,t)
+
+asympt_flows_l <- get_flows_l(raw_flows,
+                              by_period = FALSE)
+
+asympt_flows_od <- get_flows_od(raw_flows, asympt_flows_l,
+                                by_period = FALSE)
+
+G <- flow_network(asympt_flows_od,
+                  label_subgraphs = TRUE,
+                  spurious_if_below = c("rate_o" = .10),
+                  names_as_factors = FALSE)
+
+test_that("plot small network + facet_node works", {
+  pl <- plot_small_network(G,
+                           num_scale = 0.001,
+                           ignore_source_sink = FALSE)
+
+  vdiffr::expect_doppelganger("small network G with source sink", pl)
+
+  expect_error(lazyeval::f_eval(pl + facet_nodes(~ subgraph)))
+
+  pl <- plot_small_network(G,
+                           num_scale = 0.001,
+                           ignore_source_sink = TRUE)
+
+  vdiffr::expect_doppelganger("small network G without source sink", pl)
+
+  pl_facet <- pl + facet_nodes(~ subgraph)
+
+
+  vdiffr::expect_doppelganger("small network G with subgraph facet", pl_facet)
+})
+
+test_that("wrap plot of small networks", {
+
+  pl <-
+    G %>%
+    small_network_plots(num_scale = 0.001, aes_node_fill = "") %>%
+    patchwork::wrap_plots(ncol = 2)
+
+  vdiffr::expect_doppelganger("wrap of small network plots", pl)
 })

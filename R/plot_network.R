@@ -90,3 +90,24 @@ plot_small_network <- function(
     ggplot2::scale_fill_brewer(palette = node_label_palette) +
     ggplot2::guides(fill = "none")
 }
+
+#' Plot flow network.
+#'
+#' @param network Flow network.
+#' @param ... Parameters passed to plot_small_network
+#'
+#' @export
+#'
+small_network_plots <- function(
+  network, ...
+) {
+
+  subG <- get_subgraphs(network)
+
+  pls <- lapply(
+    subG,
+    plot_small_network,
+    ...)
+
+  return(pls)
+}

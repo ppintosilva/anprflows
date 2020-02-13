@@ -49,18 +49,49 @@ flow_network <- function(
       if(label_subgraphs) {
         left_join(
           .,
-          get_subgraphs(., subgraphs_ignore_source_sink),
+          subgraph_labels(., subgraphs_ignore_source_sink),
           by = c("name" = "name")
         )
-      }
+      } else .
     } %>%
     {
       if(names_as_factors & !is.null(node_levels)) {
         mutate(., name = factor(.data$name, levels = node_levels))
       } else if(names_as_factors) {
         mutate(., name = factor(.data$name))
-      }
+      } else .
     }
+}
+
+#' Label nodes according to the subgraph, if any, which they belong in.
+#'
+#' @param network A flow network
+#' @param include_source_sink Whether to include source and sink nodes in each
+#' subgraph.
+#'
+#' @return [list]
+#'
+#' @export
+#'
+get_subgraphs <- function(network, include_source_sink = TRUE) {
+  distinct_labels <-
+    network %>%
+    activate("nodes") %>%
+    as_tibble() %>%
+    distinct(.data$subgraph) %>%
+    filter(!is.na(.data$subgraph)) %>%
+    pull(.data$subgraph)
+
+  get_subgraph <- function(label)
+    network %>% activate("nodes") %>%
+    {
+      if(include_source_sink)
+        filter(., .data$subgraph == label | is.na(.data$subgraph))
+      else
+        filter(., .data$subgraph == label)
+    }
+
+  lapply(distinct_labels, get_subgraph)
 }
 
 
@@ -74,7 +105,7 @@ flow_network <- function(
 #'
 #' @export
 #'
-get_subgraphs <- function(network, ignore_source_sink = TRUE) {
+subgraph_labels <- function(network, ignore_source_sink = TRUE) {
   communities <-
     network %>%
     {

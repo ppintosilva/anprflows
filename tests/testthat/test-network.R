@@ -122,3 +122,42 @@ test_that("get neighbors from network works", {
   expect_warning(get_neighbors(G, c("209", "10000")),
                  regexp = "Ignoring nodes")
 })
+
+test_that("get subgraphs works", {
+
+  subG <- get_subgraphs(G, include_source_sink = TRUE)
+
+  expected_subG1 <-
+    G %>% activate("nodes") %>% filter(subgraph == 1 | is.na(subgraph))
+
+  expected_subG2 <-
+    G %>% activate("nodes") %>% filter(subgraph == 2 | is.na(subgraph))
+
+  expect_equal(subG[[1]] %>% as_tibble,
+               expected_subG1 %>% as_tibble)
+  expect_equal(subG[[2]] %>% as_tibble,
+               expected_subG2 %>% as_tibble)
+
+  expect_equal(subG[[1]] %>% activate("edges") %>% as_tibble,
+               expected_subG1 %>% activate("edges") %>% as_tibble)
+  expect_equal(subG[[2]] %>% activate("edges") %>% as_tibble,
+               expected_subG2 %>% activate("edges") %>% as_tibble)
+
+  subG_no_s <- get_subgraphs(G, include_source_sink = FALSE)
+
+  expected_subG1_no_s <-
+    G %>% activate("nodes") %>% filter(subgraph == 1)
+
+  expected_subG2_no_s <-
+    G %>% activate("nodes") %>% filter(subgraph == 2)
+
+  expect_equal(subG_no_s[[1]] %>% as_tibble,
+               expected_subG1_no_s %>% as_tibble)
+  expect_equal(subG_no_s[[2]] %>% as_tibble,
+               expected_subG2_no_s %>% as_tibble)
+
+  expect_equal(subG_no_s[[1]] %>% activate("edges") %>% as_tibble,
+               expected_subG1_no_s %>% activate("edges") %>% as_tibble)
+  expect_equal(subG_no_s[[2]] %>% activate("edges") %>% as_tibble,
+               expected_subG2_no_s %>% activate("edges") %>% as_tibble)
+})
