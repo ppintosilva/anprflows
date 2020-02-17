@@ -42,6 +42,9 @@ flow_network <- function(
     filtered_flows <- flows
   }
 
+  # save levels so that we can restore them later
+  location_levels <- levels(flows$o)
+
   filtered_flows %>%
     as_tbl_graph() %>%
     activate("nodes") %>%
@@ -60,7 +63,8 @@ flow_network <- function(
       } else if(names_as_factors) {
         mutate(., name = factor(.data$name))
       } else .
-    }
+    } %>%
+  mutate(name = forcats::fct_relevel(.data$name, location_levels))
 }
 
 #' Label nodes according to the subgraph, if any, which they belong in.

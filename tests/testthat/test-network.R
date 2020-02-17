@@ -1,3 +1,5 @@
+# Setup ----
+
 test1_filename <-
   system.file("testdata","small_flows_dataset_set1.csv", package="anprflows")
 
@@ -31,6 +33,16 @@ asympt_flows_od <- get_flows_od(raw_flows, asympt_flows_l,
 G <- flow_network(asympt_flows_od,
                   label_subgraphs = TRUE,
                   spurious_if_below = c("rate_o" = .10))
+
+# Tests ----
+
+test_that("factor levels before and after are the same", {
+  # test that flow network factors remain the same
+  levels_before <- levels(asympt_flows_od$o)
+  levels_after <- levels(G %>% activate(nodes) %>% as_tibble %>% pull(name))
+
+  expect_equal(levels_before, levels_after)
+})
 
 test_that("flow network works", {
 
