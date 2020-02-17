@@ -15,7 +15,9 @@ RoxygenNote: 7.0.2
 Suggests: 
     testthat (>= 2.1.0),
     vdiffr,
-    patchwork
+    patchwork,
+    knitr,
+    rmarkdown
 Depends:
     ggraph
 Imports: 
@@ -33,4 +35,6 @@ Imports:
     magrittr,
     ggplot2,
     igraph,
-    lazyeval
+    lazyeval,
+    RColorBrewer
+VignetteBuilder: knitr

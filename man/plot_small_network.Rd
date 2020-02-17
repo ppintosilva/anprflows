@@ -6,7 +6,7 @@
 \usage{
 plot_small_network(
   network,
-  ignore_source_sink = FALSE,
+  include_source_sink = TRUE,
   num_accuracy = 0.1,
   num_scale = 1,
   graph_layout = "auto",
@@ -23,13 +23,14 @@ plot_small_network(
   aes_node_label = "name",
   aes_node_fill = "name",
   node_label_color = "black",
-  node_label_palette = "Set2"
+  node_label_palette = "Set2",
+  source_sink_label_fill = "#FFFFFF"
 )
 }
 \arguments{
 \item{network}{Flow network.}
 
-\item{ignore_source_sink}{Whether to ignore source and sink nodes.}
+\item{include_source_sink}{Whether to include source and sink nodes.}
 
 \item{num_accuracy}{Number format accuracy of edge labels.}
 
@@ -64,6 +65,8 @@ plot_small_network(
 \item{node_label_color}{Font color of node labels}
 
 \item{node_label_palette}{Fill color brewer palette}
+
+\item{source_sink_label_fill}{Special fill color for source and sink nodes.}
 }
 \description{
 Plot flow network.

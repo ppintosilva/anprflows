@@ -49,7 +49,7 @@ network_processed_8am <-
 
 p1a <- plot_small_network(network_summarised_raw,
                           num_scale = 0.001,
-                          ignore_source_sink = TRUE)
+                          include_source_sink = FALSE)
 
 p1b <- plot_small_network(network_summarised_raw,
                           num_accuracy = NULL,
@@ -57,7 +57,7 @@ p1b <- plot_small_network(network_summarised_raw,
                           aes_edge_color = "flow")
 
 p2a <- plot_small_network(network_raw_8am,
-                          ignore_source_sink = TRUE)
+                          include_source_sink = FALSE)
 
 p2b <- plot_small_network(network_raw_8am,
                           aes_edge_color = "flow")
@@ -123,7 +123,7 @@ G <- flow_network(asympt_flows_od,
 test_that("plot small network + facet_node works", {
   pl <- plot_small_network(G,
                            num_scale = 0.001,
-                           ignore_source_sink = FALSE)
+                           include_source_sink = TRUE)
 
   vdiffr::expect_doppelganger("small network G with source sink", pl)
 
@@ -131,7 +131,7 @@ test_that("plot small network + facet_node works", {
 
   pl <- plot_small_network(G,
                            num_scale = 0.001,
-                           ignore_source_sink = TRUE)
+                           include_source_sink = FALSE)
 
   vdiffr::expect_doppelganger("small network G without source sink", pl)
 

@@ -1,7 +1,7 @@
 #' Plot flow network.
 #'
 #' @param network Flow network.
-#' @param ignore_source_sink Whether to ignore source and sink nodes.
+#' @param include_source_sink Whether to include source and sink nodes.
 #' @param num_accuracy Number format accuracy of edge labels.
 #' @param num_scale Multiplicative factor applied to edge labels.
 #' @param graph_layout ggraph layout parameter
@@ -19,12 +19,13 @@
 #' @param aes_node_fill Fill nodes aesthetic
 #' @param node_label_color Font color of node labels
 #' @param node_label_palette Fill color brewer palette
+#' @param source_sink_label_fill Special fill color for source and sink nodes.
 #'
 #' @export
 #'
 plot_small_network <- function(
   network,
-  ignore_source_sink = FALSE,
+  include_source_sink = TRUE,
   num_accuracy = .1,
   num_scale = 1,
   graph_layout = "auto",
@@ -41,12 +42,13 @@ plot_small_network <- function(
   aes_node_label = "name",
   aes_node_fill = "name",
   node_label_color = "black",
-  node_label_palette = "Set2"
+  node_label_palette = "Set2",
+  source_sink_label_fill = "#FFFFFF"
 ) {
 
   stopifnot("tbl_graph" %in% (class(network)))
 
-  if(ignore_source_sink) {
+  if(!include_source_sink) {
     network <-
       network %>%
       igraph::delete_vertices(c("SOURCE", "SINK")) %>%
@@ -63,6 +65,14 @@ plot_small_network <- function(
   }
 
   label_mapping <- ifelse(aes_edge_label != "", "label", "")
+
+  n_nodes <- network %>% activate("nodes") %>% as_tibble %>% nrow()
+  cols <- RColorBrewer::brewer.pal(n_nodes, node_label_palette)
+
+  if(include_source_sink) {
+    # set last 2 elements (SOURCE, SINK) to white
+    cols[length(cols):(length(cols)-1)] <- rep(source_sink_label_fill, 2)
+  }
 
   network %>%
     ggraph(layout = graph_layout) +
@@ -87,7 +97,7 @@ plot_small_network <- function(
       colour = node_label_color,
       size = label_size
     ) +
-    ggplot2::scale_fill_brewer(palette = node_label_palette) +
+    ggplot2::scale_fill_manual(values = cols) +
     ggplot2::guides(fill = "none")
 }
 
