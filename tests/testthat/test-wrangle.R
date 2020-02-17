@@ -1,23 +1,5 @@
 context("wrangle")
 
-test1_filename <-
-  system.file("testdata","small_flows_dataset_set1.csv", package="anprflows")
-
-test2_filename <-
-  system.file("testdata","small_flows_dataset_set2.csv", package="anprflows")
-
-spatial1_filename <-
-  system.file("testdata","spatial_1.rds", package="anprflows")
-
-raw_flows_1 <- read_flows_csv(filenames = test1_filename)
-raw_flows_2 <- read_flows_csv(filenames = test2_filename)
-
-spatial_1 <- readr::read_rds(spatial1_filename)
-
-raw_flows   <-
-  read_flows_csv(filenames = c(test1_filename,test2_filename)) %>%
-  dplyr::arrange(o,d,t)
-
 test_that("single csv files are read well", {
   expected_names <-
     c("o", "d", "t", "flow", "median_speed", "mean_speed", "sd_speed")
@@ -124,17 +106,14 @@ test_that("top flows work", {
 })
 
 test_that("asymptotic flows_l work", {
-  asympt_flows_l_1 <-
+  observed_nrows <-
     raw_flows_1 %>%
-    get_flows_l(by_period = FALSE)
+    get_flows_l(by_period = FALSE) %>%
+    nrow()
 
   expected_nrows <-
     get_flows_l(raw_flows_1) %>%
     distinct(l,type) %>%
-    nrow()
-
-  observed_nrows <-
-    asympt_flows_l_1 %>%
     nrow()
 
   expect_true(expected_nrows == observed_nrows)

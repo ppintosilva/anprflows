@@ -1,45 +1,9 @@
-# Setup ----
-
-test1_filename <-
-  system.file("testdata","small_flows_dataset_set1.csv", package="anprflows")
-
-test2_filename <-
-  system.file("testdata","small_flows_dataset_set2.csv", package="anprflows")
-
-raw_flows_1 <- read_flows_csv(filenames = test1_filename)
-
-raw_flows_2 <- read_flows_csv(filenames = test2_filename)
-
-asympt_flows_1_l <- get_flows_l(raw_flows_1,
-                                by_period = FALSE)
-
-asympt_flows_1_od <- get_flows_od(raw_flows_1, asympt_flows_1_l,
-                                  by_period = FALSE)
-
-# default thresholds = 0.1, 0.1
-G1 <- flow_network(asympt_flows_1_od)
-
-# Both flows together
-raw_flows   <-
-  read_flows_csv(filenames = c(test1_filename,test2_filename)) %>%
-  dplyr::arrange(o,d,t)
-
-asympt_flows_l <- get_flows_l(raw_flows,
-                              by_period = FALSE)
-
-asympt_flows_od <- get_flows_od(raw_flows, asympt_flows_l,
-                                by_period = FALSE)
-
-G <- flow_network(asympt_flows_od,
-                  label_subgraphs = TRUE,
-                  spurious_if_below = c("rate_o" = .10))
-
-# Tests ----
-
 test_that("factor levels before and after are the same", {
   # test that flow network factors remain the same
   levels_before <- levels(asympt_flows_od$o)
-  levels_after <- levels(G %>% activate(nodes) %>% as_tibble %>% pull(name))
+  levels_after <- levels(
+    G_asympt %>% activate(nodes) %>% as_tibble %>% pull(name)
+  )
 
   expect_equal(levels_before, levels_after)
 })
@@ -47,7 +11,7 @@ test_that("factor levels before and after are the same", {
 test_that("flow network works", {
 
   observed_nrow <-
-    G1 %>%
+    G1_asympt %>%
     tidygraph::activate(edges) %>%
     tibble::as_tibble() %>%
     nrow()
@@ -61,7 +25,7 @@ test_that("flow network works", {
 test_that("flow network with two subgraphs is labelled correctly", {
 
   subgraphs <-
-    G %>%
+    G_asympt %>%
     activate(nodes) %>%
     as_tibble() %>%
     distinct(subgraph) %>%
@@ -73,7 +37,7 @@ test_that("flow network with two subgraphs is labelled correctly", {
 test_that("get neighbors from network works", {
 
   subnetwork209 <-
-    get_neighbors(G, "209")
+    get_neighbors(G_asympt, "209")
 
   expect_equal(
     subnetwork209 %>%
@@ -94,7 +58,7 @@ test_that("get neighbors from network works", {
   )
 
   subnetwork54 <-
-    get_neighbors(G, "54")
+    get_neighbors(G_asympt, "54")
 
   expect_equal(
     subnetwork54 %>%
@@ -106,18 +70,18 @@ test_that("get neighbors from network works", {
   )
 
   subnetwork_209_54 <-
-    get_neighbors(G, c("209", "54"))
+    get_neighbors(G_asympt, c("209", "54"))
 
   expect_equal(
     subnetwork_209_54 %>% activate("edges") %>% as_tibble() %>% select(from,to),
-    G1 %>% activate("edges") %>% as_tibble() %>% select(from,to)
+    G1_asympt %>% activate("edges") %>% as_tibble() %>% select(from,to)
   )
 })
 
 test_that("flow network with two subgraphs is labelled correctly", {
 
   subgraphs <-
-    G %>%
+    G_asympt %>%
     activate(nodes) %>%
     as_tibble() %>%
     distinct(subgraph) %>%
@@ -126,24 +90,24 @@ test_that("flow network with two subgraphs is labelled correctly", {
   expect_equal(subgraphs, c(1,2,NA))
 })
 
-test_that("get neighbors from network works", {
+test_that("get neighbors works with inexistent node with warning", {
 
   subnetwork209 <-
-    get_neighbors(G, "209")
+    get_neighbors(G_asympt, "209")
 
-  expect_warning(get_neighbors(G, c("209", "10000")),
+  expect_warning(get_neighbors(G_asympt, c("209", "10000")),
                  regexp = "Ignoring nodes")
 })
 
 test_that("get subgraphs works", {
 
-  subG <- get_subgraphs(G, include_source_sink = TRUE)
+  subG <- get_subgraphs(G_asympt, include_source_sink = TRUE)
 
   expected_subG1 <-
-    G %>% activate("nodes") %>% filter(subgraph == 1 | is.na(subgraph))
+    G_asympt %>% activate("nodes") %>% filter(subgraph == 1 | is.na(subgraph))
 
   expected_subG2 <-
-    G %>% activate("nodes") %>% filter(subgraph == 2 | is.na(subgraph))
+    G_asympt %>% activate("nodes") %>% filter(subgraph == 2 | is.na(subgraph))
 
   expect_equal(subG[[1]] %>% as_tibble,
                expected_subG1 %>% as_tibble)
@@ -155,13 +119,13 @@ test_that("get subgraphs works", {
   expect_equal(subG[[2]] %>% activate("edges") %>% as_tibble,
                expected_subG2 %>% activate("edges") %>% as_tibble)
 
-  subG_no_s <- get_subgraphs(G, include_source_sink = FALSE)
+  subG_no_s <- get_subgraphs(G_asympt, include_source_sink = FALSE)
 
   expected_subG1_no_s <-
-    G %>% activate("nodes") %>% filter(subgraph == 1)
+    G_asympt %>% activate("nodes") %>% filter(subgraph == 1)
 
   expected_subG2_no_s <-
-    G %>% activate("nodes") %>% filter(subgraph == 2)
+    G_asympt %>% activate("nodes") %>% filter(subgraph == 2)
 
   expect_equal(subG_no_s[[1]] %>% as_tibble,
                expected_subG1_no_s %>% as_tibble)
