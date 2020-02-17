@@ -37,3 +37,6 @@ p_map_no_flows_no_paths <-
     add_arterial = TRUE,
     add_locations = FALSE,
     add_paths = FALSE)
+
+p_map_matrix <-
+  plot_map_pairs(spatial_1, G1_asympt)

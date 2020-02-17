@@ -149,3 +149,82 @@ plot_map <- function(
       axis.line = ggplot2::element_blank()
     )
 }
+
+
+#' Plot a spatial map for every od pair in a given flow network.
+#'
+#' @param spatial list of spatial features
+#' @param network flow network
+#' @param ... parameters to be passed to plot_map
+#'
+#' @export
+#'
+plot_map_pairs <- function(
+  spatial, network,
+  ...
+) {
+
+  nodes <- network %>% activate("nodes") %>% as_tibble() %>%
+    filter(.data$name != "SOURCE", .data$name != "SINK") %>%
+    tibble::rownames_to_column(var = "i") %>%
+    mutate(i = as.integer(.data$i),
+           name = as.character(.data$name)) %>%
+    select(.data$i, .data$name)
+
+  nnodes <- nrow(nodes)
+
+  edges <- network %>% activate("edges") %>% as_tibble() %>%
+    inner_join(nodes %>% rename(o = .data$name), by = c("from" = "i")) %>%
+    inner_join(nodes %>% rename(d = .data$name), by = c("to" = "i")) %>%
+    filter(.data$o != "SOURCE", .data$d != "SINK")
+
+  xy_limits <- sf::st_bbox(spatial$primary)
+  x_limits <- xy_limits[c(1,3)]
+  y_limits <- xy_limits[c(2,4)]
+
+  plot_list <- list()
+
+  # for edge in the network that does not contain SOURCE/SINK
+  for(i in 1:nnodes) {
+    for(j in 1:nnodes) {
+      index <- (i-1) * nnodes + j
+
+      candidate_edge <- edges %>% filter(.data$from == j & .data$to == i)
+
+      # if i,j is an edge (1 in adjacency matrix) then build plot
+      if(nrow(candidate_edge) > 0) {
+        odpair <- candidate_edge
+        od_nodes <- union(odpair$o, odpair$d)
+
+        # tmp var
+        subspatial <- spatial
+
+        subspatial$locations <-
+          subspatial$locations %>%
+          filter(.data$id %in% od_nodes)
+
+        subspatial$pairs <-
+          subspatial$pairs %>%
+          inner_join(odpair, by = c("o" = "o", "d" = "d"))
+
+        # return a map for each edge in the network
+        plot_list[[index]] <- plot_map(subspatial, ...) +
+          ggplot2::theme(axis.text = ggplot2::element_blank(),
+                         axis.ticks = ggplot2::element_blank())
+
+      }
+      else {
+        plot_list[[index]] <- ggplot2::ggplot() +
+          ggplot2::coord_sf(xlim = x_limits, ylim = y_limits) +
+          ggplot2::theme_void()
+      }
+    }
+  }
+
+  # fill diagonal and missing edges with empty plots
+  GGally::ggmatrix(
+    plot_list, nrow = nnodes, ncol = nnodes,
+    yAxisLabels = nodes %>% pull(.data$name),
+    xAxisLabels = nodes %>% pull(.data$name)
+  )
+}

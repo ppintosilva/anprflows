@@ -23,3 +23,8 @@ test_that("p_map_no_flows_no_paths works", {
   vdiffr::expect_doppelganger("p_map_no_flows_no_paths",
                               p_map_no_flows_no_paths)
 })
+
+test_that("plot_map_pairs works", {
+  vdiffr::expect_doppelganger("p_map_matrix",
+                              p_map_matrix)
+})
