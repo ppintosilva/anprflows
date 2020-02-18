@@ -6,7 +6,7 @@
 \usage{
 plot_map(
   spatial,
-  flows = NULL,
+  network = NULL,
   add_primary = TRUE,
   add_arterial = FALSE,
   add_paths = TRUE,
@@ -27,7 +27,7 @@ plot_map(
 \arguments{
 \item{spatial}{list of spatial features}
 
-\item{flows}{a flows_od tibble}
+\item{network}{a flows network (optional)}
 
 \item{add_primary}{whether to plot primary network}
 

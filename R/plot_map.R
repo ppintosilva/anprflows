@@ -11,7 +11,7 @@ polygon_col <- "N 9/0"
 #' Plot traffic demand over time, grouped by location.
 #'
 #' @param spatial list of spatial features
-#' @param flows a flows_od tibble
+#' @param network a flows network (optional)
 #' @param add_primary whether to plot primary network
 #' @param add_arterial whether to plot arterial network
 #' @param add_paths whether to plot shortest paths between locations
@@ -31,9 +31,10 @@ polygon_col <- "N 9/0"
 #' @param aes_color_flows color aesthetic to use for paths as a character
 #'
 #' @export
+#'
 plot_map <- function(
   spatial,
-  flows = NULL,
+  network = NULL,
   add_primary = TRUE, add_arterial = FALSE,
   add_paths = TRUE, add_locations = TRUE,
   color_primary = munsell::mnsl(primary_col),
@@ -65,20 +66,30 @@ plot_map <- function(
   if(aes_color_locations == "") {
     locations <- spatial$locations
   } else {
-    locations <- spatial$locations %>% sf::st_buffer(size_locations * 15)
+    locations <- spatial$locations %>% sf::st_buffer(size_locations * 10)
   }
 
-  if(aes_color_flows == "") {
+  if(is.null(network)) {
     pairs <- spatial$pairs
-  } else if("geometry" %in% names(flows)){
-    pairs <- flows
-  } else {
+  }
+  else {
+    nodes <-
+      flow_nodes(network) %>%
+      filter(.data$name != "SOURCE", .data$name != "SINK")
+
+    edges <- flow_edges(network, nodes)
+
     pairs <-
       suppressWarnings(
         inner_join(
-          flows %>% filter(.data$o != "SOURCE", .data$d != "SINK"),
-          spatial$pairs
+          edges,
+          spatial$pairs,
+          by = c('o' = 'o', 'd' = 'd')
         )
+      ) %>%
+      mutate(
+        o = factor(.data$o, levels(nodes$name)),
+        d = factor(.data$d, levels(nodes$name))
       )
   }
 
@@ -106,24 +117,25 @@ plot_map <- function(
       }
     } +
     {
-      if(add_paths & aes_color_flows == "") {
-        ggplot2::geom_sf(
-          data = pairs,
-          mapping = ggplot2::aes(geometry = .data$geometry),
-          color = color_paths,
-          size = size_paths
-        )
-      }
-    } +
-    {
-      if(add_paths & aes_color_flows != "") {
-        ggplot2::geom_sf(
-          data = pairs,
-          mapping = ggplot2::aes(
-            geometry = .data$geometry,
-            color = !!sym(aes_color_flows)),
-          size = size_paths
-        )
+      if(add_paths) {
+        if(aes_color_flows == "") {
+          ggplot2::geom_sf(
+            data = pairs,
+            mapping = ggplot2::aes(geometry = .data$geometry),
+            color = color_paths,
+            size = size_paths
+          )
+        }
+        else {
+          ggplot2::geom_sf(
+            data = pairs,
+            mapping = ggplot2::aes(
+              geometry = .data$geometry,
+              color = !!sym(aes_color_flows)
+            ),
+            size = size_paths
+          )
+        }
       }
     } +
     {

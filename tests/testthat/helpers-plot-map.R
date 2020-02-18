@@ -2,7 +2,7 @@
 p_map_asympt <-
   plot_map(
     spatial = spatial_1,
-    flows = asympt_flows_od_1,
+    network = G1_asympt,
     aes_color_locations = "id",
     aes_color_flows = "flow")
 
@@ -10,7 +10,7 @@ p_map_asympt <-
 p_map_flows_no_arterial_no_color <-
   plot_map(
     spatial = spatial_1,
-    flows = asympt_flows_od_1,
+    network = G1_asympt,
     aes_color_locations = "",
     aes_color_flows = "flow")
 
@@ -18,7 +18,7 @@ p_map_flows_no_arterial_no_color <-
 p_map_flows_arterial <-
   plot_map(
     spatial = spatial_1,
-    flows = asympt_flows_od_1,
+    network = G1_asympt,
     aes_color_locations = "",
     aes_color_flows = "flow",
     add_arterial = TRUE)
