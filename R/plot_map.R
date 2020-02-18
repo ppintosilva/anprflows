@@ -178,10 +178,6 @@ plot_map_pairs <- function(
     inner_join(nodes %>% rename(d = .data$name), by = c("to" = "i")) %>%
     filter(.data$o != "SOURCE", .data$d != "SINK")
 
-  xy_limits <- sf::st_bbox(spatial$primary)
-  x_limits <- xy_limits[c(1,3)]
-  y_limits <- xy_limits[c(2,4)]
-
   plot_list <- list()
 
   # for edge in the network that does not contain SOURCE/SINK
@@ -215,7 +211,6 @@ plot_map_pairs <- function(
       }
       else {
         plot_list[[index]] <- ggplot2::ggplot() +
-          ggplot2::coord_sf(xlim = x_limits, ylim = y_limits) +
           ggplot2::theme_void()
       }
     }
