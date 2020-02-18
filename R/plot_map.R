@@ -10,25 +10,25 @@ polygon_col <- "N 9/0"
 
 #' Plot traffic demand over time, grouped by location.
 #'
-#' @param spatial List of spatial features.
-#' @param flows Optional summarised flows$l tibble.
-#' @param add_primary Whether to plot primary network.
-#' @param add_arterial Whether to plot arterial network.
-#' @param add_paths Whether to plot shortest paths between locations.
-#' @param add_locations Whether to plot observed locations.
-#' @param color_primary Color of primary network.
-#' @param color_arterial Color of arterial network.
-#' @param color_locations Color of locations.
-#' @param color_paths Color of paths.
-#' @param size_primary Line size of the primary network.
-#' @param size_arterial Line size of the arterial network.
-#' @param size_paths Line size of pahts.
-#' @param size_locations Size of locations.
-#' @param locations_palette Brewer palette for locations when used together
-#' with aes_color_locations.
-#' @param aes_color_locations Color aesthetic to use for locations as
-#'  a character.
-#' @param aes_color_flows Color aesthetic to use for paths as a character.
+#' @param spatial list of spatial features
+#' @param flows a flows_od tibble
+#' @param add_primary whether to plot primary network
+#' @param add_arterial whether to plot arterial network
+#' @param add_paths whether to plot shortest paths between locations
+#' @param add_locations whether to plot observed locations
+#' @param color_primary color of primary network
+#' @param color_arterial color of arterial network
+#' @param color_locations color of locations
+#' @param color_paths color of paths
+#' @param size_primary line size of the primary network
+#' @param size_arterial line size of the arterial network
+#' @param size_paths line size of pahts
+#' @param size_locations size of locations
+#' @param locations_palette brewer palette for locations when used together
+#' with aes_color_locations
+#' @param aes_color_locations color aesthetic to use for locations as
+#'  a character
+#' @param aes_color_flows color aesthetic to use for paths as a character
 #'
 #' @export
 plot_map <- function(
@@ -65,7 +65,7 @@ plot_map <- function(
   if(aes_color_locations == "") {
     locations <- spatial$locations
   } else {
-    locations <- spatial$locations %>% sf::st_buffer(size_locations * 10)
+    locations <- spatial$locations %>% sf::st_buffer(size_locations * 15)
   }
 
   if(aes_color_flows == "") {
@@ -164,19 +164,22 @@ plot_map_pairs <- function(
   ...
 ) {
 
-  nodes <- network %>% activate("nodes") %>% as_tibble() %>%
-    filter(.data$name != "SOURCE", .data$name != "SINK") %>%
-    tibble::rownames_to_column(var = "i") %>%
-    mutate(i = as.integer(.data$i),
-           name = as.character(.data$name)) %>%
-    select(.data$i, .data$name)
+  nodes <- flow_nodes(network) %>%
+    filter(.data$name != "SOURCE", .data$name != "SINK")
 
   nnodes <- nrow(nodes)
 
-  edges <- network %>% activate("edges") %>% as_tibble() %>%
-    inner_join(nodes %>% rename(o = .data$name), by = c("from" = "i")) %>%
-    inner_join(nodes %>% rename(d = .data$name), by = c("to" = "i")) %>%
-    filter(.data$o != "SOURCE", .data$d != "SINK")
+  if(is.character(spatial$pairs$o)) {
+    llevels <- levels(nodes$name)
+  } else {
+    llevels <- union(levels(nodes$name), levels(spatial$pairs$o))
+  }
+
+  # make sure levels are the same as spatial$pairs
+  nodes <- nodes %>%
+    mutate(name = factor(.data$name, levels = llevels))
+
+  edges <- flow_edges(network, nodes)
 
   plot_list <- list()
 
@@ -201,6 +204,8 @@ plot_map_pairs <- function(
 
         subspatial$pairs <-
           subspatial$pairs %>%
+          mutate(o = factor(.data$o, levels = llevels),
+                 d = factor(.data$d, levels = llevels)) %>%
           inner_join(odpair, by = c("o" = "o", "d" = "d"))
 
         # return a map for each edge in the network

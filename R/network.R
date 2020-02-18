@@ -184,3 +184,47 @@ get_neighbors <- function(
   ) %>%
     as_tbl_graph()
 }
+
+#' Get nodes tibble from flow network
+#'
+#' @param network A flow network
+#'
+#' @return [tibble][tibble::tibble-package]
+#'
+#' @export
+#'
+flow_nodes <- function(network) {
+  network %>%
+    activate("nodes") %>%
+    as_tibble() %>%
+    tibble::rownames_to_column(var = "i") %>%
+    mutate(i = as.integer(.data$i))
+}
+
+#' Get edges tibble from flow network
+#'
+#' @param network A flow network
+#' @param nodes tibble of flow nodes, or a subset of these
+#'
+#' @return [tibble][tibble::tibble-package]
+#'
+#' @export
+#'
+flow_edges <- function(network, nodes = NULL) {
+  if(is.null(nodes))
+    nodes <- flow_nodes(network)
+
+  network %>%
+    activate("edges") %>%
+    as_tibble() %>%
+    inner_join(
+      nodes %>% rename(o = .data$name),
+      by = c("from" = "i")
+    ) %>%
+    inner_join(
+      nodes %>% rename(d = .data$name),
+      by = c("to" = "i"),
+      suffix = c(".o", ".d")
+    ) %>%
+    select(.data$o, .data$d, everything())
+}

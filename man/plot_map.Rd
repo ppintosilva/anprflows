@@ -25,41 +25,41 @@ plot_map(
 )
 }
 \arguments{
-\item{spatial}{List of spatial features.}
+\item{spatial}{list of spatial features}
 
-\item{flows}{Optional summarised flows$l tibble.}
+\item{flows}{a flows_od tibble}
 
-\item{add_primary}{Whether to plot primary network.}
+\item{add_primary}{whether to plot primary network}
 
-\item{add_arterial}{Whether to plot arterial network.}
+\item{add_arterial}{whether to plot arterial network}
 
-\item{add_paths}{Whether to plot shortest paths between locations.}
+\item{add_paths}{whether to plot shortest paths between locations}
 
-\item{add_locations}{Whether to plot observed locations.}
+\item{add_locations}{whether to plot observed locations}
 
-\item{color_primary}{Color of primary network.}
+\item{color_primary}{color of primary network}
 
-\item{color_arterial}{Color of arterial network.}
+\item{color_arterial}{color of arterial network}
 
-\item{color_locations}{Color of locations.}
+\item{color_locations}{color of locations}
 
-\item{color_paths}{Color of paths.}
+\item{color_paths}{color of paths}
 
-\item{size_primary}{Line size of the primary network.}
+\item{size_primary}{line size of the primary network}
 
-\item{size_arterial}{Line size of the arterial network.}
+\item{size_arterial}{line size of the arterial network}
 
-\item{size_paths}{Line size of pahts.}
+\item{size_paths}{line size of pahts}
 
-\item{size_locations}{Size of locations.}
+\item{size_locations}{size of locations}
 
-\item{aes_color_locations}{Color aesthetic to use for locations as
-a character.}
+\item{aes_color_locations}{color aesthetic to use for locations as
+a character}
 
-\item{locations_palette}{Brewer palette for locations when used together
-with aes_color_locations.}
+\item{locations_palette}{brewer palette for locations when used together
+with aes_color_locations}
 
-\item{aes_color_flows}{Color aesthetic to use for paths as a character.}
+\item{aes_color_flows}{color aesthetic to use for paths as a character}
 }
 \description{
 Plot traffic demand over time, grouped by location.
