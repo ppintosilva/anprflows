@@ -171,7 +171,7 @@ plot_map <- function(
 #'
 #' @export
 #'
-plot_map_pairs <- function(
+plot_map_matrix <- function(
   spatial, network,
   ...
 ) {
