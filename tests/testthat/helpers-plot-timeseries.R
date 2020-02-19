@@ -31,6 +31,11 @@ p_demand_od_2 <- plot_demand_od(flows_od_1,
 
 p_speed_od <- plot_speed_od(flows_od_1)
 
+p_speed_od_no_color <-
+  plot_speed_od(
+    flows_od_1 %>% filter(o == 209 & d == 54),
+    aes_color = "")
+
 p_speed_od_no_ribbon <-
   plot_speed_od(
     flows_od_1,

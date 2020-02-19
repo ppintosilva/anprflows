@@ -12,6 +12,10 @@ test_that("timeseries demand od plots work", {
 })
 
 test_that("timeseries speed od plots work", {
-  vdiffr::expect_doppelganger("plot speed od", p_speed_od)
-  vdiffr::expect_doppelganger("plot speed od no ribbon", p_speed_od_no_ribbon)
+  vdiffr::expect_doppelganger("plot speed od",
+                              p_speed_od)
+  vdiffr::expect_doppelganger("plot speed single od no color",
+                              p_speed_od_no_color)
+  vdiffr::expect_doppelganger("plot speed od no ribbon",
+                              p_speed_od_no_ribbon)
 })
