@@ -16,9 +16,9 @@ plot_demand_od(
 )
 }
 \arguments{
-\item{flows_od}{Trimmed flows$od tibble.}
+\item{flows_od}{flows_od tibble.}
 
-\item{time_breaks}{Breaks for scale_x_datetime}
+\item{time_breaks}{breaks for scale_x_datetime}
 
 \item{add_points}{whether to include point layer}
 

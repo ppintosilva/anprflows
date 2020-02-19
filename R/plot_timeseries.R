@@ -1,13 +1,13 @@
 #' Plot traffic demand over time, grouped by location.
 #'
-#' @param flows_l Trimmed flows$l tibble.
-#' @param time_breaks Breaks for scale_x_datetime
-#' @param point_alpha Alpha parameter of point layer
-#' @param point_size Size parameter of point layer
-#' @param line_size Size parameter of line layer
-#' @param out_flow Whether to plot outgoing or incoming flow
-#' @param include_source_sink Whether to include either source or sink nodes
-#' in graph depending on out or incoming flow.
+#' @param flows_l flows_l tibble
+#' @param time_breaks breaks for scale_x_datetime
+#' @param point_alpha alpha parameter of point layer
+#' @param point_size size parameter of point layer
+#' @param line_size size parameter of line layer
+#' @param out_flow whether to plot outgoing or incoming flow
+#' @param include_source_sink whether to include either source or sink nodes
+#' in graph depending on out or incoming flow
 #'
 #' @export
 #'
@@ -67,8 +67,8 @@ plot_demand_l <- function(
 
 #' Plot traffic demand over time
 #'
-#' @param flows_od Trimmed flows$od tibble.
-#' @param time_breaks Breaks for scale_x_datetime
+#' @param flows_od flows_od tibble.
+#' @param time_breaks breaks for scale_x_datetime
 #' @param add_points whether to include point layer
 #' @param aes_color color aesthetic
 #' @param point_alpha alpha parameter of point layer

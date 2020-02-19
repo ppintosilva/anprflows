@@ -15,20 +15,20 @@ plot_demand_l(
 )
 }
 \arguments{
-\item{flows_l}{Trimmed flows$l tibble.}
+\item{flows_l}{flows_l tibble}
 
-\item{time_breaks}{Breaks for scale_x_datetime}
+\item{time_breaks}{breaks for scale_x_datetime}
 
-\item{point_alpha}{Alpha parameter of point layer}
+\item{point_alpha}{alpha parameter of point layer}
 
-\item{point_size}{Size parameter of point layer}
+\item{point_size}{size parameter of point layer}
 
-\item{line_size}{Size parameter of line layer}
+\item{line_size}{size parameter of line layer}
 
-\item{out_flow}{Whether to plot outgoing or incoming flow}
+\item{out_flow}{whether to plot outgoing or incoming flow}
 
-\item{include_source_sink}{Whether to include either source or sink nodes
-in graph depending on out or incoming flow.}
+\item{include_source_sink}{whether to include either source or sink nodes
+in graph depending on out or incoming flow}
 }
 \description{
 Plot traffic demand over time, grouped by location.
