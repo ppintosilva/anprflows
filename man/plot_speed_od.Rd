@@ -7,6 +7,8 @@
 plot_speed_od(
   flows_od,
   time_breaks = NULL,
+  add_points = TRUE,
+  aes_color = "od",
   point_alpha = 0.5,
   point_size = 0.75,
   add_ribbon = TRUE,
@@ -16,21 +18,25 @@ plot_speed_od(
 )
 }
 \arguments{
-\item{flows_od}{Trimmed flows$od tibble.}
+\item{flows_od}{trimmed flows$od tibble}
 
-\item{time_breaks}{Breaks for scale_x_datetime}
+\item{time_breaks}{breaks for scale_x_datetime}
 
-\item{point_alpha}{Alpha parameter of point layer}
+\item{add_points}{whether to include point layer}
 
-\item{point_size}{Size parameter of point layer}
+\item{aes_color}{color aesthetic}
 
-\item{add_ribbon}{Whether to add ribbon representing deviation from the mean}
+\item{point_alpha}{alpha parameter of point layer}
 
-\item{ribbon_alpha}{Alpha parameter of ribbon layer}
+\item{point_size}{size parameter of point layer}
 
-\item{ribbon_fill}{Fill parameter of ribbon layer}
+\item{add_ribbon}{whether to add ribbon representing deviation from the mean}
 
-\item{line_size}{Size parameter of line layer}
+\item{ribbon_alpha}{alpha parameter of ribbon layer}
+
+\item{ribbon_fill}{fill parameter of ribbon layer}
+
+\item{line_size}{size parameter of line layer}
 }
 \description{
 Plot traffic speed over time, grouped by od pair.

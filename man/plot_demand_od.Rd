@@ -2,11 +2,13 @@
 % Please edit documentation in R/plot_timeseries.R
 \name{plot_demand_od}
 \alias{plot_demand_od}
-\title{Plot traffic demand over time, grouped by od pair.}
+\title{Plot traffic demand over time}
 \usage{
 plot_demand_od(
   flows_od,
   time_breaks = NULL,
+  add_points = TRUE,
+  aes_color = "od",
   point_alpha = 0.5,
   point_size = 0.75,
   line_size = 0.5,
@@ -18,15 +20,19 @@ plot_demand_od(
 
 \item{time_breaks}{Breaks for scale_x_datetime}
 
-\item{point_alpha}{Alpha parameter of point layer}
+\item{add_points}{whether to include point layer}
 
-\item{point_size}{Size parameter of point layer}
+\item{aes_color}{color aesthetic}
 
-\item{line_size}{Size parameter of line layer}
+\item{point_alpha}{alpha parameter of point layer}
 
-\item{include_source_sink}{Include or exclude edges from source or to sink
-nodes.}
+\item{point_size}{size parameter of point layer}
+
+\item{line_size}{size parameter of line layer}
+
+\item{include_source_sink}{include or exclude edges from source or to sink
+nodes}
 }
 \description{
-Plot traffic demand over time, grouped by od pair.
+Plot traffic demand over time
 }
