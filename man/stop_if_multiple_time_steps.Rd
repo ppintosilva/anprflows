@@ -7,7 +7,7 @@
 stop_if_multiple_time_steps(flows_od)
 }
 \arguments{
-\item{flows_od}{OD flows tibble.}
+\item{flows_od}{OD flows tibble}
 }
 \description{
 Check whether time column exists and throw error

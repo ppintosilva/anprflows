@@ -15,6 +15,8 @@ p_demand_l_2 <- plot_demand_l(
   point_alpha = .3,
   point_size = 2,
   time_breaks = time_breaks,
+  full_datetime_format = "%y-%m-%d %Hh",
+  partial_datetime_format = "%Hh",
   include_source_sink = TRUE,
   out_flow = FALSE
 )
@@ -42,3 +44,8 @@ p_speed_od_no_ribbon <-
     time_breaks = time_breaks,
     add_ribbon = FALSE
   )
+
+# OD matrix plots
+
+p_demand_matrix <- plot_ts_matrix(flows_od_1, type = "demand")
+p_speed_matrix <- plot_ts_matrix(flows_od_1, type = "speed")

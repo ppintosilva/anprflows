@@ -7,6 +7,8 @@
 plot_speed_od(
   flows_od,
   time_breaks = NULL,
+  full_datetime_format = "\%y-\%m-\%d \%H:\%M",
+  partial_datetime_format = "\%H:\%M",
   add_points = TRUE,
   aes_color = "od",
   point_alpha = 0.5,
@@ -21,6 +23,10 @@ plot_speed_od(
 \item{flows_od}{trimmed flows$od tibble}
 
 \item{time_breaks}{breaks for scale_x_datetime}
+
+\item{full_datetime_format}{datetime format applied to first and last breaks}
+
+\item{partial_datetime_format}{datetime format applied to elements in between}
 
 \item{add_points}{whether to include point layer}
 

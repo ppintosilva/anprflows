@@ -7,9 +7,9 @@
 first_element_greater(vec, number)
 }
 \arguments{
-\item{vec}{Numeric.}
+\item{vec}{numeric}
 
-\item{number}{Numeric of length 1.}
+\item{number}{numeric of length 1}
 }
 \description{
 Get first element greater than number in vector.

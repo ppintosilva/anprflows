@@ -1,20 +1,35 @@
-#' Get pretty time labels from breaks.
+#' Get pretty time labels from breaks. Full format is applied to generate
+#' the first two labels, whilst partial format is applied to all labels in
+#' between.
 #'
-#' @param time_breaks Trimmed flows tibble.
+#' @param datetime_breaks input datetime breaks
+#' @param full_datetime_format datetime format applied to first and last breaks
+#' @param partial_datetime_format datetime format applied to elements in between
 #'
-get_time_labels <- function(time_breaks) {
-  time_labels <- c(
-    time_breaks[1] %>% format("%y-%m-%d %H:%M"),
-    time_breaks[2:(length(time_breaks)-1)] %>% format("%H:%M"),
-    tail(time_breaks,1) %>% format("%y-%m-%d %H:%M")
-  )
-  return(time_labels)
+get_datetime_labels <- function(
+  datetime_breaks,
+  full_datetime_format = "%y-%m-%d %H:%M",
+  partial_datetime_format = "%H:%M"
+) {
+  b <- datetime_breaks
+
+  if(length(datetime_breaks) > 2) {
+    l <- c(
+      b[1] %>% format(full_datetime_format),
+      b[2:(length(b)-1)] %>%
+        format(partial_datetime_format),
+      tail(b,1) %>% format(full_datetime_format)
+    )
+  } else {
+    l <- b %>% format(full_datetime_format)
+  }
+  return(l)
 }
 
 #' Get first element greater than number in vector.
 #'
-#' @param vec Numeric.
-#' @param number Numeric of length 1.
+#' @param vec numeric
+#' @param number numeric of length 1
 first_element_greater <- function(vec, number){
   el <- vec[vec > number][1]
   ifelse(is.na(el), vec[length(vec)], el)
@@ -23,7 +38,7 @@ first_element_greater <- function(vec, number){
 
 #' Check whether time column exists and throw error
 #'
-#' @param flows_od OD flows tibble.
+#' @param flows_od OD flows tibble
 stop_if_multiple_time_steps <- function(flows_od) {
   # If column 't' exists it should have a single distinct value
   if(tibble::has_name(flows_od, 't')) {
@@ -33,4 +48,15 @@ stop_if_multiple_time_steps <- function(flows_od) {
         "(length(unique(flows_od$t)) == 1)"))
     }
   }
+}
+
+
+#' Get an empty ggplot
+blank_plot <- function() {
+  ggplot2::ggplot() +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      panel.grid = ggplot2::element_blank(),
+      panel.border = ggplot2::element_blank(),
+      axis.line = ggplot2::element_line(size = .2, colour = "grey30"))
 }

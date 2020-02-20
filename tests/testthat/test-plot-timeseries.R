@@ -19,3 +19,8 @@ test_that("timeseries speed od plots work", {
   vdiffr::expect_doppelganger("plot speed od no ribbon",
                               p_speed_od_no_ribbon)
 })
+
+test_that("timeseries matrix plot work", {
+  vdiffr::expect_doppelganger("plot ts matrix demand", p_demand_matrix)
+  vdiffr::expect_doppelganger("plot ts matrix speed", p_speed_matrix)
+})

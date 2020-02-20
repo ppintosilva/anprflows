@@ -7,6 +7,8 @@
 plot_demand_l(
   flows_l,
   time_breaks = NULL,
+  full_datetime_format = "\%y-\%m-\%d \%H:\%M",
+  partial_datetime_format = "\%H:\%M",
   point_alpha = 0.5,
   point_size = 0.75,
   line_size = 0.5,
@@ -18,6 +20,10 @@ plot_demand_l(
 \item{flows_l}{flows_l tibble}
 
 \item{time_breaks}{breaks for scale_x_datetime}
+
+\item{full_datetime_format}{datetime format applied to first and last breaks}
+
+\item{partial_datetime_format}{datetime format applied to elements in between}
 
 \item{point_alpha}{alpha parameter of point layer}
 
