@@ -242,6 +242,7 @@ plot_speed_od <- function(
 #' @param aes_color color aesthetic
 #' @param include_source_sink whether to include either source or sink nodes
 #' in demand plot depending on out or incoming flow
+#' @param datetime_format overriding datetime_format in individual plots
 #' @param ... further parameters passed on to plot_demand_od and plot_speed_od
 #'
 #' @export
@@ -252,6 +253,7 @@ plot_ts_matrix <- function(
   add_points = FALSE,
   aes_color = "",
   include_source_sink = TRUE,
+  datetime_format = "%d %b %Hh",
   ...
 ) {
 
@@ -325,7 +327,7 @@ plot_ts_matrix <- function(
   x3_4th <- xmid + (xmax-xmid)/2
 
   xbreaks <- c(x1_4th,x3_4th)
-  xlabels <- c(format(x1_4th, "%d %b %Hh"), format(x3_4th, "%d %b %Hh"))
+  xlabels <- c(format(x1_4th, datetime_format), format(x3_4th, datetime_format))
   xlims <- c(xmin, xmax)
 
   # very inefficient but works for now

@@ -10,6 +10,7 @@ plot_ts_matrix(
   add_points = FALSE,
   aes_color = "",
   include_source_sink = TRUE,
+  datetime_format = "\%d \%b \%Hh",
   ...
 )
 }
@@ -24,6 +25,8 @@ plot_ts_matrix(
 
 \item{include_source_sink}{whether to include either source or sink nodes
 in demand plot depending on out or incoming flow}
+
+\item{datetime_format}{overriding datetime_format in individual plots}
 
 \item{...}{further parameters passed on to plot_demand_od and plot_speed_od}
 }
