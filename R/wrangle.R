@@ -167,7 +167,6 @@ crop_spatial <- function(
   # intersection primary and arterial with flows (zoom in)
   bbox <-
     pairs %>%
-    filter(.data$o != "SOURCE", .data$d != "SINK") %>%
     pull(.data$geometry) %>%
     sf::st_bbox() +
     bbox_margin
@@ -322,4 +321,188 @@ top_flows <- function(
     # values equal to pthreshold
     filter(.data$p_cumflow <= (.data$pthreshold + epsilon)) %>%
     select(-.data$pthreshold)
+}
+
+
+#' Get the subset of flows whose OD pairs account for the top
+#' p proportion of total or period-wise observed traffic flow.
+#' Returns all od pairs up to the first od pair that exceeds p.
+#'
+#' @param flows_od flows at ods [tibble][tibble::tibble-package]
+#' @param flows_l flows at locations [tibble][tibble::tibble-package]
+#' @param time_resolution temporal resolution of flow tibbles
+#' @param locations filter observations occurring at these locations (vector)
+#' @param pairs filter observations involving these
+#' od pairs [tibble][tibble::tibble-package]
+#' @param filter_dayperiod filter observations occurring
+#' at this period of the day
+#' @param fill_gaps whether to make missing time steps explicit
+#' @param filter_weekdays filter observations occurring on these weekdays
+#' @param min_t first expected time step, defaults to minimum time in data
+#' @param max_t last expected time step, defaults to maximum time in data
+#'
+#' @return list with updated tibbles of flows_od and flows_l
+#'
+#' @export
+#'
+cut_flows <- function(
+  flows_od, flows_l,
+  time_resolution,
+  locations = NULL,
+  pairs = NULL,
+  filter_dayperiod = "morning rush",
+  fill_gaps = TRUE,
+  filter_weekdays = c(1:5),
+  min_t = NULL,
+  max_t = NULL
+) {
+
+  if(is.null(min_t))
+    min_t <- min(flows_l$t)
+
+  if(is.null(max_t))
+    max_t <- max(flows_l$t)
+
+  all_t <- seq(min_t, max_t, by = time_resolution)
+
+  if(!is.null(locations)) {
+    flows_l <- flows_l %>%
+      filter(.data$l %in% locations)
+
+    flows_od <- flows_od %>%
+      filter(.data$o %in% locations | .data$d %in% locations)
+  }
+
+  if(!is.null(pairs)) {
+    locs <- union(
+      pull(pairs, .data$o),
+      pull(pairs, .data$d)
+    )
+
+    flows_l <- flows_l %>% filter(.data$l %in% locs)
+
+    flows_levels <- levels(flows_od$o)
+    pairs <- pairs %>%
+      dplyr::mutate_if(is.character, factor, levels = flows_levels)
+
+    flows_od <- flows_od %>% inner_join(pairs, by = c("o" = "o", "d" = "d"))
+  }
+
+  if(!is.null(filter_dayperiod)) {
+    flows_l <- flows_l %>%
+      add_dayperiod() %>%
+      filter(.data$dayperiod == filter_dayperiod) %>%
+      select(-.data$dayperiod)
+
+    flows_od <- flows_od %>%
+      add_dayperiod() %>%
+      filter(.data$dayperiod == filter_dayperiod) %>%
+      select(-.data$dayperiod)
+  }
+
+  if(!is.null(filter_weekdays)) {
+    flows_l <- flows_l %>%
+      filter(lubridate::wday(.data$t, week_start = 1) %in% filter_weekdays)
+
+    flows_od <- flows_od %>%
+      filter(lubridate::wday(.data$t, week_start = 1) %in% filter_weekdays)
+  }
+
+  subset_t <- tibble(t = all_t) %>%
+    {
+      if(!is.null(filter_dayperiod)) {
+        add_dayperiod(.) %>%
+          filter(.data$dayperiod == filter_dayperiod) %>%
+          select(-.data$dayperiod)
+      }
+      else .
+    } %>%
+    {
+      if(!is.null(filter_weekdays)) {
+        filter(., lubridate::wday(.data$t, week_start = 1) %in% filter_weekdays)
+      }
+      else .
+    }
+
+  if(fill_gaps) {
+    fill_time_gaps(flows_od, flows_l, subset_t)
+  } else {
+    list("l" = flows_l, "od" = flows_od)
+  }
+}
+
+#' Make missing time steps explicit (zero vehicle count).
+#'
+#' @param flows_od flows at ods [tibble][tibble::tibble-package]
+#' @param flows_l flows at locations [tibble][tibble::tibble-package]
+#' @param expected_time [tibble][tibble::tibble-package] with expected steps
+#'
+#' @return list with updated tibbles of flows_od and flows_l
+#'
+#' @export
+#'
+fill_time_gaps <- function(flows_od, flows_l, expected_time) {
+
+  # pivot wider for filling in missing combinations
+  flows_l <- flows_l %>%
+    pivot_wider(names_from = "type",
+                values_from = "flow",
+                names_prefix = "flow_")
+
+  # determine which combinations are missing in the data
+  t_dummy <- expected_time %>% mutate(dummy = 0)
+  distinct_l <- distinct(flows_l, .data$l) %>% mutate(dummy = 0)
+  distinct_od <- distinct(flows_od, .data$o, .data$d) %>% mutate(dummy = 0)
+
+  expected_flows_l  <-
+    full_join(t_dummy, distinct_l, by = "dummy") %>%
+    select(-.data$dummy)
+
+  expected_flows_od <-
+    full_join(t_dummy, distinct_od, by = "dummy") %>%
+    select(-.data$dummy)
+
+  # the anti join of expected and actual observations gives us the missing ones
+  missing_flows_l <-
+    anti_join(expected_flows_l, flows_l,
+              by = c("l", "t")) %>%
+    mutate(flow_in = 0, flow_out = 0)
+
+  flows_l <- flows_l %>%
+    bind_rows(missing_flows_l) %>%
+    assertr::verify(
+      nrow(expected_flows_l) == nrow(distinct(.))
+    ) %>%
+    mutate(flow_in = replace_na(.data$flow_in, 0)) %>%
+    mutate(flow_out = replace_na(.data$flow_out, 0)) %>%
+    arrange(.data$t, .data$l)
+
+
+  missing_flows_od <-
+    anti_join(expected_flows_od, flows_od,
+              by = c("o","d", "t")) %>%
+    mutate(flow = 0, rate_o = 0, rate_d = 0) %>%
+    # fill in missing flow_o_out values
+    left_join(flows_l %>%
+                select(.data$l, .data$t, .data$flow_out) %>%
+                rename(flow_o_out = .data$flow_out),
+              by = c("o" = "l", "t" = "t")) %>%
+    # fill in missing flow_o_out values
+    left_join(flows_l %>%
+                select(.data$l, .data$t, .data$flow_in) %>%
+                rename(flow_d_in = .data$flow_in),
+              by = c("d" = "l", "t" = "t"))
+
+  flows_od <- flows_od %>%
+    bind_rows(missing_flows_od) %>%
+    arrange(.data$t, .data$o, .data$d)
+
+  # flows_l back to long format
+  flows_l <- flows_l %>%
+    pivot_longer(cols = starts_with("flow_"),
+                 names_to = "type",
+                 values_to = "flow") %>%
+    mutate(type = if_else(.data$type == "flow_in", "in", "out"))
+
+  list("l" = flows_l, "od" = flows_od)
 }

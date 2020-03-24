@@ -144,3 +144,25 @@ test_that("asymptotic flows_od work", {
 
   expect_true(expected_nrows == observed_nrows)
 })
+
+test_that("cut flows fill_gaps = FALSE works", {
+  # 1 od, morning rush, 15 min resolution
+  # 1day, 4 hours * 4 steps per hour
+  expected_nrows <- 4*4
+  observed_nrows <- cflows_gaps$od %>% nrow()
+
+  expect_true(expected_nrows == observed_nrows)
+})
+
+test_that("cut flows fill_gaps = TRUE works", {
+  # 1 od, morning rush, 15 min resolution
+  # 2 days, 4 hours * 4 steps per hour
+  expected_nrows <- 4*4*2
+  observed_nrows <- cflows_nogaps$od %>% nrow()
+
+  expect_true(expected_nrows == observed_nrows)
+
+  # flow in second day is zero
+  day2_cflows_nogaps <- cflows_nogaps$od %>% filter(lubridate::day(t) == 2)
+  expect_true(day2_cflows_nogaps$flow %>% sum() == 0)
+})
