@@ -64,7 +64,7 @@ blank_plot <- function() {
 #'
 #' @param t time vector
 #'
-#' @return
+#' @return vector of corresponding periods# of the day (categorical)
 #'
 #' @export
 #'
@@ -75,4 +75,20 @@ dayperiod <- function(t) {
       lubridate::hour(t) >= 10 & lubridate::hour(t) < 16 ~ "day",
       lubridate::hour(t) >= 16 & lubridate::hour(t) < 21 ~ "afternoon"
     )
+}
+
+#' Transform a vector of n elements (1,2,3) into a vector of consecutive
+#' character tuples of length n-1 ("1-2","2-3").
+#'
+#' @param v vector
+#' @param unite_sep character separator to unite consecutive elements into tuples
+#'
+as_tuples <- function(v, unite_sep = "-") {
+  v %>%
+    enframe(name = NULL, value = "level") %>%
+    mutate(level_lag1 = lead(.data$level, 1)) %>%
+    # remove last row
+    slice(1:(dplyr::n()-1)) %>%
+    unite("level", .data$level, .data$level_lag1, sep = unite_sep) %>%
+    pull(.data$level)
 }

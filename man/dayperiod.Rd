@@ -10,7 +10,7 @@ dayperiod(t)
 \item{t}{time vector}
 }
 \value{
-
+vector of corresponding periods# of the day (categorical)
 }
 \description{
 Categorise time into its corresponding period of the day
