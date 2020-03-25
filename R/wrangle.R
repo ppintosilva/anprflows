@@ -174,9 +174,9 @@ crop_spatial <- function(
   # looking for arterial network data in
   #   spatial$arterial and spatial$arterial$edges
   if(is.null(spatial$arterial$edges)) {
-    arterial <- suppressWarnings(sf::st_crop(spatial$arterial, bbox))
+    arterial <- try_st_crop(spatial$arterial, bbox, "arterial network")
   } else {
-    arterial <- suppressWarnings(sf::st_crop(spatial$arterial$edges, bbox))
+    arterial <- try_st_crop(spatial$arterial$edges, bbox, "arterial network")
   }
 
   arterial <-
@@ -189,12 +189,12 @@ crop_spatial <- function(
   # looking for primary network data in
   #   spatial$primary and spatial$primary$edges
   if(is.null(spatial$primary$edges)) {
-    primary <- suppressWarnings(sf::st_crop(spatial$primary, bbox))
+    primary <- try_st_crop(spatial$primary, bbox, "primary network")
   } else {
-    primary <- suppressWarnings(sf::st_crop(spatial$primary$edges, bbox))
+    primary <- try_st_crop(spatial$primary$edges, bbox, "primary network")
   }
 
-  amenities <- suppressWarnings(sf::st_crop(spatial$amenities, bbox))
+  amenities <- try_st_crop(spatial$amenities, bbox, "amenities")
 
   return(
     list(

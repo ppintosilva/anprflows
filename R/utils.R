@@ -76,3 +76,23 @@ dayperiod <- function(t) {
       lubridate::hour(t) >= 16 & lubridate::hour(t) < 21 ~ "afternoon"
     )
 }
+
+#' Check whether time column exists and throw error
+#'
+#' @param sf_tibble a simple features tibble
+#' @param bbox a st_bbox object
+#' @param sf_name the name of the tibble to be used if st_crop fails
+try_st_crop <- function(sf_tibble, bbox, sf_name) {
+  try(
+    cropped_sf <- suppressWarnings(sf::st_crop(sf_tibble, bbox))
+  )
+
+  if(cropped_sf %>% is.null()) {
+    stop(paste0("GDAL threw an error while attempting to crop the '",
+                sf_name, "' tibble. ",
+                "Please adjust the bbox margins and try again."))
+  }
+  else {
+    return(cropped_sf)
+  }
+}
