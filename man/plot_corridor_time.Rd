@@ -8,15 +8,27 @@ where the bottom and top of the y axis represent the start and end of the
 corridor, respectively. Segment levels are calculated from location levels.
 Location levels should be adjusted before the function call.}
 \usage{
-plot_corridor_time(corridor_flows, fill_var, unite_sep = "-")
+plot_corridor_time(
+  corridor_flows,
+  fill_var,
+  date_breaks = "4 hours",
+  date_labels = "\%Hh",
+  location_levels = NULL
+)
 }
 \arguments{
 \item{corridor_flows}{corridor od flows [tibble][tibble::tibble-package]}
 
 \item{fill_var}{var to fill geom_tiles with}
 
-\item{unite_sep}{separator used to unite origin and
-destination into single od character}
+\item{date_breaks}{string specifying the distance between breaks used by
+scale_x_datetime}
+
+\item{date_labels}{string specifying the datetime format of labels used by
+scale_x_datetime}
+
+\item{location_levels}{override location levels, otherwise use levels of
+existing 'o' column of input flows}
 }
 \value{
 ggplot
