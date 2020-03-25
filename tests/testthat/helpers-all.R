@@ -65,20 +65,21 @@ G1_8am_slice <-
   flow_network(spurious_if_below = NULL)
 
 # cut flows
-cflows_gaps <- cut_flows(
+segment_77_209_gaps <- cut_flows(
   flows_od, flows_l,
   time_resolution = "15 min",
   pairs = tibble(o = "77", d = "209"),
   fill_gaps = FALSE)
 
-cflows_extra_row <- tibble(l = factor("77", levels(flows_od$o)),
-                           t = lubridate::ymd_hms("2018-01-02 10:00:00"),
-                           flow = 23, type = "in")
+segment_77_209_extra_row <-
+  tibble(l = factor("77", levels(flows_od$o)),
+         t = lubridate::ymd_hms("2018-01-02 10:00:00"),
+         flow = 23, type = "in")
 
 
-cflows_nogaps <- cut_flows(
+segment_77_209_nogaps <- cut_flows(
   flows_od,
-  suppressWarnings(bind_rows(flows_l, cflows_extra_row)),
+  suppressWarnings(bind_rows(flows_l, segment_77_209_extra_row)),
   time_resolution = "15 min",
   pairs = tibble(o = "77", d = "209"),
   fill_gaps = TRUE)
