@@ -1,5 +1,7 @@
 context("plot-timeseries")
 
+skip_on_travis()
+
 test_that("timeseries demand location plots work", {
   vdiffr::expect_doppelganger("plot flows_l out no source", p_demand_l_0)
   vdiffr::expect_doppelganger("plot flows_l out", p_demand_l_1)

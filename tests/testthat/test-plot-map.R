@@ -1,5 +1,7 @@
 context("plot-map")
 
+skip_on_travis()
+
 test_that("p_map_asympt works", {
   vdiffr::expect_doppelganger("p_map_asympt", p_map_asympt)
 })

@@ -1,5 +1,7 @@
 context("plot-network")
 
+skip_on_travis()
+
 test_that("plot graph stops if multiple time steps", {
   expect_error(
     plot_small_network(flows_od))
