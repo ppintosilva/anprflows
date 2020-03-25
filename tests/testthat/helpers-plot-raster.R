@@ -12,6 +12,5 @@ corridor_flows <-
     d = factor(d, levels =  c("77","209","54"))
   )
 
-corridor_speed_rasters <- plot_corridor_time_speed(corridor_flows)
-corridor_flow_rasters <- plot_corridor_time(corridor_flows,
-                                            fill_var = flow)
+corridor_speed_rasters <- plot_spacetime_speed(corridor_flows)
+corridor_flow_rasters <- plot_spacetime(corridor_flows, fill_var = flow)

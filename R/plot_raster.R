@@ -17,7 +17,7 @@
 #'
 #' @export
 #'
-plot_corridor_time <- function(
+plot_spacetime <- function(
   corridor_flows,
   fill_var,
   date_breaks = "4 hours",
@@ -75,7 +75,7 @@ plot_corridor_time <- function(
 #'
 #' @export
 #'
-plot_corridor_time_speed <- function(
+plot_spacetime_speed <- function(
   corridor_flows,
   fill_var = .data$mean_speed,
   date_breaks = "4 hours",
@@ -88,7 +88,7 @@ plot_corridor_time_speed <- function(
   fill_var <- enquo(fill_var)
 
   corridor_flows %>%
-    plot_corridor_time(
+    plot_spacetime(
       fill_var = !! fill_var,
       date_breaks = date_breaks,
       date_labels = date_labels,
@@ -100,5 +100,4 @@ plot_corridor_time_speed <- function(
       colours = scale_gradientn_colours
     )
 }
-
 
