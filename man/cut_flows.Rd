@@ -12,7 +12,7 @@ cut_flows(
   time_resolution,
   locations = NULL,
   pairs = NULL,
-  filter_dayperiod = "morning rush",
+  filter_dayperiod = "morning",
   fill_gaps = TRUE,
   filter_weekdays = c(1:5),
   min_t = NULL,

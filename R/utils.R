@@ -50,7 +50,6 @@ stop_if_multiple_time_steps <- function(flows_od) {
   }
 }
 
-
 #' Get an empty ggplot
 blank_plot <- function() {
   ggplot2::ggplot() +
@@ -61,18 +60,19 @@ blank_plot <- function() {
       axis.line = ggplot2::element_line(size = .2, colour = "grey30"))
 }
 
-#' Add column with period of the day to a tibble with time column "t"
+#' Categorise time into its corresponding period of the day
 #'
-#' @param df A tibble with datetime or time column 't'
+#' @param t time vector
+#'
+#' @return
+#'
 #' @export
 #'
-add_dayperiod <- function(df) {
-  df %>%
-    mutate(dayperiod = dplyr::case_when(
-      lubridate::hour(.data$t) >= 21 | lubridate::hour(.data$t) < 6 ~ "night",
-      lubridate::hour(.data$t) >= 6  & lubridate::hour(.data$t) < 10 ~ "morning rush",
-      lubridate::hour(.data$t) >= 10 & lubridate::hour(.data$t) < 16 ~ "day",
-      lubridate::hour(.data$t) >= 16 & lubridate::hour(.data$t) < 21 ~ "afternoon rush")
-    ) %>%
-    mutate(dayperiod = factor(.data$dayperiod))
+dayperiod <- function(t) {
+  dplyr::case_when(
+      lubridate::hour(t) >= 21 | lubridate::hour(t) < 6 ~ "night",
+      lubridate::hour(t) >= 6  & lubridate::hour(t) < 10 ~ "morning",
+      lubridate::hour(t) >= 10 & lubridate::hour(t) < 16 ~ "day",
+      lubridate::hour(t) >= 16 & lubridate::hour(t) < 21 ~ "afternoon"
+    )
 }

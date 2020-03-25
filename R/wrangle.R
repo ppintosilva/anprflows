@@ -350,7 +350,7 @@ cut_flows <- function(
   time_resolution,
   locations = NULL,
   pairs = NULL,
-  filter_dayperiod = "morning rush",
+  filter_dayperiod = "morning",
   fill_gaps = TRUE,
   filter_weekdays = c(1:5),
   min_t = NULL,
@@ -389,15 +389,9 @@ cut_flows <- function(
   }
 
   if(!is.null(filter_dayperiod)) {
-    flows_l <- flows_l %>%
-      add_dayperiod() %>%
-      filter(.data$dayperiod == filter_dayperiod) %>%
-      select(-.data$dayperiod)
+    flows_l <- flows_l %>% filter(dayperiod(.data$t) == filter_dayperiod)
 
-    flows_od <- flows_od %>%
-      add_dayperiod() %>%
-      filter(.data$dayperiod == filter_dayperiod) %>%
-      select(-.data$dayperiod)
+    flows_od <- flows_od %>% filter(dayperiod(.data$t) == filter_dayperiod)
   }
 
   if(!is.null(filter_weekdays)) {
@@ -411,9 +405,7 @@ cut_flows <- function(
   subset_t <- tibble(t = all_t) %>%
     {
       if(!is.null(filter_dayperiod)) {
-        add_dayperiod(.) %>%
-          filter(.data$dayperiod == filter_dayperiod) %>%
-          select(-.data$dayperiod)
+        filter(., dayperiod(.data$t) == filter_dayperiod)
       }
       else .
     } %>%
