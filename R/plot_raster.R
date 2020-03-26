@@ -34,10 +34,11 @@ plot_spacetime <- function(
   # locations as breaks instead of ods: give each od an integer and
   # shift them to minor breaks, so that major breaks are given to locations
   corridor_flows %>%
-    mutate(id = match(.data$o, location_levels) + 0.5) %>%
+    mutate(y = match(.data$o, location_levels) + 0.5) %>%
     ggplot2::ggplot() +
-    ggplot2::geom_tile(
-      ggplot2::aes(x = .data$t, y = .data$id, fill = !! fill_var)
+    ggplot2::geom_raster(
+      ggplot2::aes(x = .data$t, y = .data$y, fill = !! fill_var),
+      hjust = 1
     ) +
     ggplot2::scale_x_datetime(
       name = "Time",
