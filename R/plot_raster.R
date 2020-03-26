@@ -101,3 +101,43 @@ plot_spacetime_speed <- function(
     )
 }
 
+
+#' Facet a corridor od flows tibble, e.g. by date, and generate a space time
+#' plot for each. This function was written as an alternative to the use of
+#' facet_wrap which was behaving awkwardly with geom_tile.
+#'
+#' @param corridor_flows corridor od flows [tibble][tibble::tibble-package]
+#' @param fill_var var to fill geom_tiles with
+#' @param facet_by var whose distinct values are used to facet the flows tibble
+#' @param ... further parameters passed to plot_spacetime
+#'
+#' @return list of ggplots
+#'
+#' @export
+#'
+spacetime_plotlist <- function(
+  corridor_flows,
+  fill_var,
+  facet_by,
+  ...
+) {
+  fill_var <- enquo(fill_var)
+  facet_by <- enquo(facet_by)
+
+  facet_values <- corridor_flows %>%
+    ungroup() %>%
+    mutate(tmp = !! facet_by) %>%
+    distinct(.data$tmp) %>%
+    pull(.data$tmp)
+
+  all_plots <- lapply(
+    facet_values,
+    function(x) plot_spacetime(
+      corridor_flows %>% filter(!! facet_by == x),
+      fill_var = !! fill_var,
+      ...
+    )
+  )
+
+  return(all_plots)
+}

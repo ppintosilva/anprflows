@@ -14,3 +14,17 @@ corridor_flows <-
 
 corridor_speed_rasters <- plot_spacetime_speed(corridor_flows)
 corridor_flow_rasters <- plot_spacetime(corridor_flows, fill_var = flow)
+
+corridor_flow_matrix <- GGally::ggmatrix(
+  plots = spacetime_plotlist(
+    corridor_flows,
+    fill_var = flow,
+    facet_by = lubridate::hour(t),
+    date_breaks = "15 min",
+    date_labels = "%Mm"
+  ),
+  nrow = 4, ncol = 6,
+  xAxisLabels = paste0(c("00", "01", "02", "03", "04", "05"), "h"),
+  yAxisLabels = paste0(c("+00", "+06", "+12", "+18"), "h"),
+  legend = c(1,1)
+)
