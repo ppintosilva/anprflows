@@ -63,18 +63,19 @@ blank_plot <- function() {
 #' Categorise time into its corresponding period of the day
 #'
 #' @param t time vector
+#' @param bounds daily time boundaries
 #'
 #' @return vector of corresponding periods# of the day (categorical)
 #'
 #' @export
 #'
-dayperiod <- function(t) {
+dayperiod <- function(t, bounds = c(6,10,16,21)) {
   dplyr::case_when(
-      lubridate::hour(t) >= 21 | lubridate::hour(t) < 6 ~ "night",
-      lubridate::hour(t) >= 6  & lubridate::hour(t) < 10 ~ "morning",
-      lubridate::hour(t) >= 10 & lubridate::hour(t) < 16 ~ "day",
-      lubridate::hour(t) >= 16 & lubridate::hour(t) < 21 ~ "afternoon"
-    )
+    lubridate::hour(t) >= bounds[4] | lubridate::hour(t) < bounds[1] ~ "night",
+    lubridate::hour(t) >= bounds[1] & lubridate::hour(t) < bounds[2] ~ "morning",
+    lubridate::hour(t) >= bounds[2] & lubridate::hour(t) < bounds[3] ~ "day",
+    lubridate::hour(t) >= bounds[3] & lubridate::hour(t) < bounds[4] ~ "afternoon"
+  )
 }
 
 #' Check whether time column exists and throw error

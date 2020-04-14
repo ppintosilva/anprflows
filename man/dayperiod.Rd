@@ -4,10 +4,12 @@
 \alias{dayperiod}
 \title{Categorise time into its corresponding period of the day}
 \usage{
-dayperiod(t)
+dayperiod(t, bounds = c(6, 10, 16, 21))
 }
 \arguments{
 \item{t}{time vector}
+
+\item{bounds}{daily time boundaries}
 }
 \value{
 vector of corresponding periods# of the day (categorical)
