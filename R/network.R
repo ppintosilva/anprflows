@@ -5,8 +5,6 @@
 #' the corresponding threshold.
 #' @param label_subgraphs Whether to label subgraphs as a result of removing
 #' spurious edges.
-#' @param subgraphs_ignore_source_sink Whether to ignore source and sink
-#' nodes in label calculation.
 #' @param names_as_factors Whether to convert node names to factor.
 #' @param node_levels Optionally set the levels of node factor.
 #'
@@ -18,7 +16,6 @@ flow_network <- function(
   flows,
   spurious_if_below = c("rate_o" = .1, "rate_d" = .1),
   label_subgraphs = TRUE,
-  subgraphs_ignore_source_sink = TRUE,
   names_as_factors = TRUE,
   node_levels = NULL
 ) {
@@ -52,7 +49,7 @@ flow_network <- function(
       if(label_subgraphs) {
         left_join(
           .,
-          subgraph_labels(., subgraphs_ignore_source_sink),
+          subgraph_labels(.),
           by = c("name" = "name")
         )
       } else .
@@ -102,21 +99,16 @@ get_subgraphs <- function(network, include_source_sink = TRUE) {
 #' Label nodes according to the subgraph, if any, which they belong in.
 #'
 #' @param network A flow network
-#' @param ignore_source_sink Whether to ignore source and sink nodes in label
-#' calculation.
 #'
 #' @return [tbl_graph]
 #'
 #' @export
 #'
-subgraph_labels <- function(network, ignore_source_sink = TRUE) {
+subgraph_labels <- function(network) {
+  # make sure source and sink are deleted before finding sub-graphs
   communities <-
     network %>%
-    {
-      if(ignore_source_sink) {
-        igraph::delete.vertices(., c("SOURCE", "SINK"))
-      }
-    } %>%
+    filter(! .data$name %in% c("SOURCE", "SINK")) %>%
     igraph::decompose.graph()
 
   1:length(communities) %>%

@@ -8,7 +8,6 @@ flow_network(
   flows,
   spurious_if_below = c(rate_o = 0.1, rate_d = 0.1),
   label_subgraphs = TRUE,
-  subgraphs_ignore_source_sink = TRUE,
   names_as_factors = TRUE,
   node_levels = NULL
 )
@@ -21,9 +20,6 @@ the corresponding threshold.}
 
 \item{label_subgraphs}{Whether to label subgraphs as a result of removing
 spurious edges.}
-
-\item{subgraphs_ignore_source_sink}{Whether to ignore source and sink
-nodes in label calculation.}
 
 \item{names_as_factors}{Whether to convert node names to factor.}
 
