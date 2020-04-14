@@ -7,23 +7,22 @@
 plot_small_network(
   network,
   include_source_sink = TRUE,
-  num_accuracy = 0.1,
-  num_scale = 1,
-  graph_layout = "auto",
-  aes_edge_color = "",
-  aes_edge_label = "flow",
-  edge_angle_calc = "along",
-  edge_label_dodge = ggplot2::unit(2.5, "mm"),
+  graph_layout = "sugiyama",
+  edge_color = NULL,
+  edge_label = NULL,
+  node_label = .data$name,
+  node_fill = .data$subgraph,
   edge_arrow = ggplot2::arrow(length = ggplot2::unit(3, "mm")),
   edge_start_cap = ggraph::circle(5, "mm"),
   edge_end_cap = ggraph::circle(5, "mm"),
+  edge_angle_calc = "along",
+  edge_label_dodge = ggplot2::unit(2.5, "mm"),
   edge_width = 1,
   edge_alpha = 0.75,
+  num_accuracy = 0.1,
+  num_scale = 1,
   label_size = 5,
-  aes_node_label = "name",
-  aes_node_fill = "name",
-  node_label_color = "black",
-  node_label_palette = "Set2",
+  label_color = "black",
   source_sink_label_fill = "#FFFFFF"
 )
 }
@@ -32,19 +31,15 @@ plot_small_network(
 
 \item{include_source_sink}{Whether to include source and sink nodes.}
 
-\item{num_accuracy}{Number format accuracy of edge labels.}
-
-\item{num_scale}{Multiplicative factor applied to edge labels.}
-
 \item{graph_layout}{ggraph layout parameter}
 
-\item{aes_edge_color}{Optionally color edges according to this aesthetic}
+\item{edge_color}{Optionally color edges according to this aesthetic}
 
-\item{aes_edge_label}{Optionally label edges according to this aesthetic}
+\item{edge_label}{Optionally label edges according to this aesthetic}
 
-\item{edge_angle_calc}{Edges label angle parameter}
+\item{node_label}{Label nodes aesthetic}
 
-\item{edge_label_dodge}{Edges label dodge parameter}
+\item{node_fill}{Fill nodes aesthetic}
 
 \item{edge_arrow}{Edge arrow}
 
@@ -52,19 +47,21 @@ plot_small_network(
 
 \item{edge_end_cap}{Arrow distance from ending node}
 
+\item{edge_angle_calc}{Edges label angle parameter}
+
+\item{edge_label_dodge}{Edges label dodge parameter}
+
 \item{edge_width}{Edge width}
 
 \item{edge_alpha}{Edge alpha}
 
+\item{num_accuracy}{Number format accuracy of edge labels.}
+
+\item{num_scale}{Multiplicative factor applied to edge labels.}
+
 \item{label_size}{Node label size}
 
-\item{aes_node_label}{Label nodes aesthetic}
-
-\item{aes_node_fill}{Fill nodes aesthetic}
-
-\item{node_label_color}{Font color of node labels}
-
-\item{node_label_palette}{Fill color brewer palette}
+\item{label_color}{Font color of node labels}
 
 \item{source_sink_label_fill}{Special fill color for source and sink nodes.}
 }

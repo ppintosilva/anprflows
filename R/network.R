@@ -51,7 +51,7 @@ flow_network <- function(
           .,
           subgraph_labels(.),
           by = c("name" = "name")
-        )
+        ) %>% mutate(subgraph = factor(.data$subgraph))
       } else .
     } %>%
     {
@@ -118,11 +118,7 @@ subgraph_labels <- function(network) {
           activate("nodes") %>%
           as_tibble() %>%
           mutate(subgraph = x)) %>%
-    bind_rows() %>%
-    mutate(
-      subgraph = ifelse(.data$name == "SOURCE" | .data$name == "SINK",
-                        NA, .data$subgraph)
-    )
+    bind_rows()
 }
 
 

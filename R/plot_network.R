@@ -5,8 +5,12 @@
 #' @param num_accuracy Number format accuracy of edge labels.
 #' @param num_scale Multiplicative factor applied to edge labels.
 #' @param graph_layout ggraph layout parameter
-#' @param aes_edge_color Optionally color edges according to this aesthetic
-#' @param aes_edge_label Optionally label edges according to this aesthetic
+#'
+#' @param edge_color Optionally color edges according to this aesthetic
+#' @param edge_label Optionally label edges according to this aesthetic
+#' @param node_label Label nodes aesthetic
+#' @param node_fill Fill nodes aesthetic
+#'
 #' @param edge_angle_calc Edges label angle parameter
 #' @param edge_label_dodge Edges label dodge parameter
 #' @param edge_arrow Edge arrow
@@ -14,11 +18,9 @@
 #' @param edge_end_cap Arrow distance from ending node
 #' @param edge_width Edge width
 #' @param edge_alpha Edge alpha
+#'
 #' @param label_size Node label size
-#' @param aes_node_label Label nodes aesthetic
-#' @param aes_node_fill Fill nodes aesthetic
-#' @param node_label_color Font color of node labels
-#' @param node_label_palette Fill color brewer palette
+#' @param label_color Font color of node labels
 #' @param source_sink_label_fill Special fill color for source and sink nodes.
 #'
 #' @export
@@ -26,60 +28,58 @@
 plot_small_network <- function(
   network,
   include_source_sink = TRUE,
-  num_accuracy = .1,
-  num_scale = 1,
-  graph_layout = "auto",
-  aes_edge_color = "",
-  aes_edge_label = "flow",
-  edge_angle_calc = 'along',
-  edge_label_dodge = ggplot2::unit(2.5, 'mm'),
+  graph_layout = "sugiyama",
+  # aesthetics
+  edge_color = NULL,
+  edge_label = NULL,
+  node_label = .data$name,
+  node_fill = .data$subgraph,
+  # edge beautifications
   edge_arrow = ggplot2::arrow(length = ggplot2::unit(3, 'mm')),
   edge_start_cap = ggraph::circle(5, 'mm'),
   edge_end_cap = ggraph::circle(5, 'mm'),
+  edge_angle_calc = 'along',
+  edge_label_dodge = ggplot2::unit(2.5, 'mm'),
   edge_width = 1,
   edge_alpha = .75,
+  num_accuracy = .1,
+  num_scale = 1,
+  # label beautifications
   label_size = 5,
-  aes_node_label = "name",
-  aes_node_fill = "name",
-  node_label_color = "black",
-  node_label_palette = "Set2",
+  label_color = "black",
   source_sink_label_fill = "#FFFFFF"
 ) {
+
+  node_label <- enquo(node_label)
+  node_fill  <- enquo(node_fill)
+  edge_color <- enquo(edge_color)
+  edge_label <- enquo(edge_label)
 
   stopifnot("tbl_graph" %in% (class(network)))
 
   if(!include_source_sink) {
-    network <-
-      network %>%
-      igraph::delete_vertices(c("SOURCE", "SINK")) %>%
-      as_tbl_graph()
+    network <- network %>% activate("nodes") %>%
+      filter(! .data$name %in% c("SOURCE", "SINK"))
   }
 
-  if(aes_edge_label != "") {
+  if(! rlang::quo_is_null(edge_label)) {
     network <-
       network %>%
       activate("edges") %>%
-      mutate(label = scales::number(!!sym(aes_edge_label),
+      mutate(label = scales::number(!! edge_label,
                                     accuracy = num_accuracy,
                                     scale = num_scale))
-  }
-
-  label_mapping <- ifelse(aes_edge_label != "", "label", "")
-
-  n_nodes <- network %>% activate("nodes") %>% as_tibble %>% nrow()
-  cols <- RColorBrewer::brewer.pal(n_nodes, node_label_palette)
-
-  if(include_source_sink) {
-    # set last 2 elements (SOURCE, SINK) to white
-    cols[length(cols):(length(cols)-1)] <- rep(source_sink_label_fill, 2)
+    edge_label <- sym("label")
+  } else {
+    edge_label <- quo(NULL)
   }
 
   network %>%
     ggraph(layout = graph_layout) +
     geom_edge_fan(
       ggplot2::aes(
-        color = !!sym(aes_edge_color),
-        label = !!sym(label_mapping)
+        color = !! edge_color,
+        label = !! edge_label
       ),
       angle_calc = edge_angle_calc,
       label_dodge = edge_label_dodge,
@@ -91,14 +91,13 @@ plot_small_network <- function(
     ) +
     geom_node_label(
       ggplot2::aes(
-        label = !!sym(aes_node_label),
-        fill = !!sym(aes_node_fill)
+        label = !! node_label,
+        fill =  !! node_fill
       ),
-      colour = node_label_color,
+      colour = label_color,
       size = label_size
     ) +
-    ggplot2::scale_fill_manual(values = cols) +
-    ggplot2::guides(fill = "none")
+    ggplot2::scale_fill_brewer(type = "qual", na.value = "grey70")
 }
 
 #' Plot flow network.

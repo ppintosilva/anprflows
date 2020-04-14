@@ -19,6 +19,7 @@ Suggests:
 Depends:
     ggraph
 Imports: 
+    rlang,
     dplyr,
     tidyr,
     readr,

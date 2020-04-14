@@ -29,9 +29,10 @@ test_that("flow network with two subgraphs is labelled correctly", {
     activate(nodes) %>%
     as_tibble() %>%
     distinct(subgraph) %>%
+    mutate(subgraph = forcats::fct_explicit_na(subgraph, na_level = "NA")) %>%
     pull(subgraph)
 
-  expect_equal(subgraphs, c(1,2,NA))
+  expect_equal(levels(subgraphs), c("1","2","NA"))
 })
 
 test_that("get neighbors from network works", {
@@ -85,9 +86,10 @@ test_that("flow network with two subgraphs is labelled correctly", {
     activate(nodes) %>%
     as_tibble() %>%
     distinct(subgraph) %>%
+    mutate(subgraph = forcats::fct_explicit_na(subgraph, na_level = "NA")) %>%
     pull(subgraph)
 
-  expect_equal(subgraphs, c(1,2,NA))
+  expect_equal(levels(subgraphs), c("1","2","NA"))
 })
 
 test_that("get neighbors works with inexistent node with warning", {
