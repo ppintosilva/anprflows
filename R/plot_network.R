@@ -47,7 +47,7 @@ plot_small_network <- function(
   # label beautifications
   label_size = 5,
   label_color = "black",
-  source_sink_label_fill = "#FFFFFF"
+  source_sink_label_fill = "grey70"
 ) {
 
   node_label <- enquo(node_label)
@@ -97,7 +97,8 @@ plot_small_network <- function(
       colour = label_color,
       size = label_size
     ) +
-    ggplot2::scale_fill_brewer(type = "qual", na.value = "grey70")
+    ggplot2::scale_fill_brewer(type = "qual",
+                               na.value = source_sink_label_fill)
 }
 
 #' Plot flow network.
