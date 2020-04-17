@@ -16,8 +16,6 @@ Suggests:
     testthat (>= 2.1.0),
     vdiffr,
     patchwork
-Depends:
-    ggraph
 Imports: 
     rlang,
     dplyr,
@@ -33,6 +31,7 @@ Imports:
     scales,
     magrittr,
     ggplot2,
+    ggraph,
     igraph,
     lazyeval,
     RColorBrewer,

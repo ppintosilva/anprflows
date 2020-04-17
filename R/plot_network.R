@@ -6,7 +6,6 @@
 #' @param num_scale Multiplicative factor applied to edge labels.
 #' @param graph_layout ggraph layout parameter
 #'
-#' @param edge_color Optionally color edges according to this aesthetic
 #' @param edge_label Optionally label edges according to this aesthetic
 #' @param node_label Label nodes aesthetic
 #' @param node_fill Fill nodes aesthetic
@@ -30,7 +29,6 @@ plot_small_network <- function(
   include_source_sink = TRUE,
   graph_layout = "sugiyama",
   # aesthetics
-  edge_color = NULL,
   edge_label = NULL,
   node_label = .data$name,
   node_fill = .data$subgraph,
@@ -52,7 +50,6 @@ plot_small_network <- function(
 
   node_label <- enquo(node_label)
   node_fill  <- enquo(node_fill)
-  edge_color <- enquo(edge_color)
   edge_label <- enquo(edge_label)
 
   stopifnot("tbl_graph" %in% (class(network)))
@@ -78,7 +75,6 @@ plot_small_network <- function(
     ggraph(layout = graph_layout) +
     geom_edge_fan(
       ggplot2::aes(
-        color = !! edge_color,
         label = !! edge_label
       ),
       angle_calc = edge_angle_calc,

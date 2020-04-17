@@ -8,7 +8,6 @@ plot_small_network(
   network,
   include_source_sink = TRUE,
   graph_layout = "sugiyama",
-  edge_color = NULL,
   edge_label = NULL,
   node_label = .data$name,
   node_fill = .data$subgraph,
@@ -32,8 +31,6 @@ plot_small_network(
 \item{include_source_sink}{Whether to include source and sink nodes.}
 
 \item{graph_layout}{ggraph layout parameter}
-
-\item{edge_color}{Optionally color edges according to this aesthetic}
 
 \item{edge_label}{Optionally label edges according to this aesthetic}
 
