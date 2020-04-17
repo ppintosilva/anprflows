@@ -150,7 +150,7 @@ test_that("all paths works, no source sink", {
 
   observed_path_stats <- paths %>%
     group_by(subgraph, path) %>%
-    summarise(N = n())
+    summarise(N = dplyr::n())
 
   expected_path_stats <-
     tribble(
@@ -173,7 +173,7 @@ test_that("all paths works, 2ith source sink", {
 
   observed_path_stats <- paths %>%
     group_by(subgraph, path) %>%
-    summarise(N = n()) %>%
+    summarise(N = dplyr::n()) %>%
     arrange(subgraph, N) %>%
     select(subgraph, N)
 
