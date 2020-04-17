@@ -1,3 +1,5 @@
+# tests ----
+
 test_that("factor levels before and after are the same", {
   # test that flow network factors remain the same
   levels_before <- levels(asympt_flows_od$o)
