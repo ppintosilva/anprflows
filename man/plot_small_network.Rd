@@ -23,7 +23,7 @@ plot_small_network(
   num_scale = 1,
   label_size = 5,
   label_color = "black",
-  source_sink_label_fill = "#FFFFFF"
+  source_sink_label_fill = "grey70"
 )
 }
 \arguments{
