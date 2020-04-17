@@ -139,3 +139,60 @@ test_that("get subgraphs works", {
   expect_equal(subG_no_s[[2]] %>% activate("edges") %>% as_tibble,
                expected_subG2_no_s %>% activate("edges") %>% as_tibble)
 })
+
+test_that("all paths works, no source sink", {
+
+  subgraphs <- get_subgraphs(G_asympt, include_source_sink = FALSE)
+
+  paths <- vec_all_paths(subgraphs)
+
+  observed_path_stats <- paths %>%
+    group_by(subgraph, path) %>%
+    summarise(N = n())
+
+  expected_path_stats <-
+    tribble(
+      ~subgraph, ~path, ~N,
+      #---,---,
+      1, 1, 3, # 77 -> 209 -> 54
+      2, 1, 3  # 133 -> 112 -> 199
+    ) %>%
+    mutate(subgraph = as.character(subgraph)) %>%
+    mutate_if(is.double, as.integer)
+
+  expect_equal(expected_path_stats, observed_path_stats)
+})
+
+test_that("all paths works, 2ith source sink", {
+
+  subgraphs <- get_subgraphs(G_asympt, include_source_sink = TRUE)
+
+  paths <- vec_all_paths(subgraphs)
+
+  observed_path_stats <- paths %>%
+    group_by(subgraph, path) %>%
+    summarise(N = n()) %>%
+    arrange(subgraph, N) %>%
+    select(subgraph, N)
+
+  expected_path_stats <- tribble(
+    ~subgraph, ~N,
+    #---,---,
+    # subgraph 1: 5 nodes, 6  edges
+    # (edges SOURCE -> 54 and 209 -> SINK have been remove as spurious)
+    1, 3, # SOURCE -> 77 -> SINK
+    1, 4, # SOURCE -> 77 -> 209 -> SINK
+    1, 5, # SOURCE -> 77 -> 209 -> 54 -> SINK
+    # subgraph 2: 5 nodes, 7  edges
+    # (edges SOURCE -> 54 and 209 -> SINK have been remove as spurious)
+    2, 3, # SOURCE -> 133 -> SINK
+    2, 3, # SOURCE -> 112 -> SINK
+    2, 4, # SOURCE -> 133 -> 112 -> SINK
+    2, 4, # SOURCE -> 112 -> 199 -> SINK
+    2, 5, # SOURCE -> 133 -> 112 -> 199 -> SINK
+  ) %>%
+    mutate(subgraph = as.character(subgraph),
+           N = as.integer(N))
+
+  expect_equal(expected_path_stats, observed_path_stats)
+})

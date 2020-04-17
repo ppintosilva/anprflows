@@ -216,3 +216,79 @@ flow_edges <- function(network, nodes = NULL) {
     ) %>%
     select(.data$o, .data$d, everything())
 }
+
+
+#' For each Search for all simple paths from source to sink. This is a wrapper around
+#' igraph::all_simple_paths that tidys up the results into a single tibble.
+#'
+#' @param Gs a list of graphs
+#'
+#' @return a tibble
+#'
+vec_all_paths <- function(Gs) {
+  Gs %>%
+    lapply(all_paths) %>%
+    bind_rows(.id = "subgraph") %>%
+    select(.data$subgraph, everything()) %>%
+    arrange(.data$subgraph, .data$path,
+            .data$segment_label, .data$segment_level)
+}
+
+#' Search for all simple paths from source to sink. This is a wrapper around
+#' igraph::all_simple_paths that tidys up the results into a single tibble.
+#'
+#' @param G a flow graph
+#'
+#' @return a tibble
+#'
+all_paths <- function(G) {
+  # get source (only outgoing edges) and sink (only incoming edges) nodes
+  source_sink <- activate(G, "nodes") %>%
+    mutate(
+      source = tidygraph::node_is_source(),
+      sink = tidygraph::node_is_sink()
+    ) %>%
+    filter(.data$source | .data$sink) %>%
+    as_tibble() %>%
+    select(.data$name, .data$source, .data$sink)
+
+  # all combinations between source and sink
+  combinations <- tidyr::expand_grid(
+    # source nodes
+    from = source_sink %>% filter(.data$source) %>% pull(.data$name),
+    # sink nodes
+    to = source_sink %>% filter(.data$sink) %>% pull(.data$name)
+  ) %>%
+    # to make sure that levels are used instead of labels
+    dplyr::mutate_if(is.factor, as.character)
+
+  # compute all simple paths for each row (combination of source,sink)
+  simple_paths <- purrr::pmap(
+    list(combinations$from, combinations$to),
+    function(x,y) igraph::all_simple_paths(G, from = x, to = y, mode = "out")
+  )
+
+  path_lengths <- simple_paths %>%
+    purrr::map(function(x) purrr::map(x, names)) %>%
+    purrr::map(length) %>%
+    unlist()
+
+  simple_paths %>%
+    # remove empty lists (combinations for which there was no simple path)
+    .[which(path_lengths > 0)] %>%
+    # retrive paths from list and tidy up
+    purrr::map(
+      function(x) purrr::map(x, names) %>%
+        tibble(segment_level = .) %>%
+        rownames_to_column(var = "path_id") %>%
+        unnest(.data$segment_level) %>%
+        group_by(.data$path_id) %>%
+        mutate(segment_label = row_number())
+    ) %>%
+    bind_rows(.id = "rowname") %>%
+    group_by(.data$rowname, .data$path_id) %>%
+    mutate(path = group_indices()) %>%
+    ungroup() %>%
+    select(.data$path, .data$segment_label, .data$segment_level) %>%
+    arrange(.data$path, .data$segment_label)
+}

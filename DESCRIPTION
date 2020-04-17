@@ -36,4 +36,5 @@ Imports:
     igraph,
     lazyeval,
     RColorBrewer,
-    GGally
+    GGally,
+    purrr
