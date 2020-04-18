@@ -198,3 +198,23 @@ test_that("all paths works, 2ith source sink", {
 
   expect_equal(expected_path_stats, observed_path_stats)
 })
+
+test_that("flow network with 0 nodes returns empty tbl_graph", {
+
+  G1 <- flow_network(
+    asympt_flows_od_1,
+    label_subgraphs = FALSE,
+    spurious_if_below = c("rate_o" = 1.0),
+    keep_levels = TRUE
+  )
+
+  G2 <- flow_network(
+    asympt_flows_od_1,
+    label_subgraphs = TRUE,
+    spurious_if_below = c("rate_o" = 1.0),
+    keep_levels = TRUE
+  )
+
+  expect_equal(igraph::gsize(G1), 0)
+  expect_equal(igraph::gsize(G2), 0)
+})

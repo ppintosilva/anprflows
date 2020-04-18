@@ -42,8 +42,13 @@ flow_network <- function(
   # save levels so that we can restore them later
   location_levels <- levels(flows$o)
 
-  filtered_flows %>%
-    as_tbl_graph() %>%
+  G <- filtered_flows %>% as_tbl_graph()
+
+  if(igraph::gsize(G) == 0) {
+    return(G)
+  }
+
+  G %>%
     activate("nodes") %>%
     {
       if(label_subgraphs) {
