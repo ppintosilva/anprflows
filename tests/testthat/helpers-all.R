@@ -48,15 +48,13 @@ G_asympt <- flow_network(
 G1_asympt <- flow_network(
   asympt_flows_od_1,
   label_subgraphs = TRUE,
-  spurious_if_below = c("rate_o" = .10),
-  names_as_factors = FALSE
+  spurious_if_below = c("rate_o" = .10)
 )
 
 G1_asympt_no_spurious <- flow_network(
   asympt_flows_od_1,
   label_subgraphs = TRUE,
-  spurious_if_below = NULL,
-  names_as_factors = FALSE
+  spurious_if_below = NULL
 )
 
 G1_8am_slice <-

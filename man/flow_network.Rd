@@ -8,8 +8,7 @@ flow_network(
   flows,
   spurious_if_below = c(rate_o = 0.1, rate_d = 0.1),
   label_subgraphs = TRUE,
-  names_as_factors = TRUE,
-  node_levels = NULL
+  keep_levels = TRUE
 )
 }
 \arguments{
@@ -21,9 +20,7 @@ the corresponding threshold.}
 \item{label_subgraphs}{Whether to label subgraphs as a result of removing
 spurious edges.}
 
-\item{names_as_factors}{Whether to convert node names to factor.}
-
-\item{node_levels}{Optionally set the levels of node factor.}
+\item{keep_levels}{Whether nodes should keep the same factor levels as flows.}
 }
 \value{
 [tbl_graph]

@@ -5,8 +5,7 @@
 #' the corresponding threshold.
 #' @param label_subgraphs Whether to label subgraphs as a result of removing
 #' spurious edges.
-#' @param names_as_factors Whether to convert node names to factor.
-#' @param node_levels Optionally set the levels of node factor.
+#' @param keep_levels Whether nodes should keep the same factor levels as flows.
 #'
 #' @return [tbl_graph]
 #'
@@ -16,8 +15,7 @@ flow_network <- function(
   flows,
   spurious_if_below = c("rate_o" = .1, "rate_d" = .1),
   label_subgraphs = TRUE,
-  names_as_factors = TRUE,
-  node_levels = NULL
+  keep_levels = TRUE
 ) {
 
   # If column 't' exists it should have a single distinct value
@@ -34,6 +32,8 @@ flow_network <- function(
         function(x) flows %>% filter(!!sym(x) > spurious_if_below[x])
       ) %>%
       bind_rows() %>%
+      # distinct is necessary when applying multiple rules
+      # (as the same node can meet multiple conditions and appear duplicate)
       distinct(.data$o,.data$d, .keep_all = TRUE)
   } else {
     filtered_flows <- flows
@@ -50,18 +50,17 @@ flow_network <- function(
         left_join(
           .,
           subgraph_labels(.),
-          by = c("name" = "name")
-        ) %>% mutate(subgraph = factor(.data$subgraph))
+          by = "name"
+        ) %>%
+          mutate(subgraph = factor(.data$subgraph))
       } else .
     } %>%
     {
-      if(names_as_factors & !is.null(node_levels)) {
-        mutate(., name = factor(.data$name, levels = node_levels))
-      } else if(names_as_factors) {
+      if(keep_levels)
+        mutate(., name = factor(.data$name, levels = location_levels))
+      else
         mutate(., name = factor(.data$name))
-      } else .
-    } %>%
-  mutate(name = forcats::fct_relevel(.data$name, location_levels))
+    }
 }
 
 #' Label nodes according to the subgraph, if any, which they belong in.
