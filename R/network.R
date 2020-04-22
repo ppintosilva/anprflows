@@ -229,6 +229,8 @@ flow_edges <- function(network, nodes = NULL) {
 #'
 #' @return a tibble
 #'
+#' @export
+#'
 vec_all_paths <- function(Gs) {
   Gs %>%
     lapply(all_paths) %>%
@@ -244,6 +246,8 @@ vec_all_paths <- function(Gs) {
 #' @param G a flow graph
 #'
 #' @return a tibble
+#'
+#' @export
 #'
 all_paths <- function(G) {
   # get source (only outgoing edges) and sink (only incoming edges) nodes
