@@ -19,8 +19,6 @@ plot_map(
   size_arterial = 0.1,
   size_paths = 0.5,
   size_locations = 3,
-  aes_color_locations = "",
-  locations_palette = "Set2",
   aes_color_flows = ""
 )
 }
@@ -52,12 +50,6 @@ plot_map(
 \item{size_paths}{line size of pahts}
 
 \item{size_locations}{size of locations}
-
-\item{aes_color_locations}{color aesthetic to use for locations as
-a character}
-
-\item{locations_palette}{brewer palette for locations when used together
-with aes_color_locations}
 
 \item{aes_color_flows}{color aesthetic to use for paths as a character}
 }

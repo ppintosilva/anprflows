@@ -24,10 +24,6 @@ polygon_col <- "N 9/0"
 #' @param size_arterial line size of the arterial network
 #' @param size_paths line size of pahts
 #' @param size_locations size of locations
-#' @param locations_palette brewer palette for locations when used together
-#' with aes_color_locations
-#' @param aes_color_locations color aesthetic to use for locations as
-#'  a character
 #' @param aes_color_flows color aesthetic to use for paths as a character
 #'
 #' @export
@@ -45,8 +41,6 @@ plot_map <- function(
   size_arterial = .1,
   size_paths = .5,
   size_locations = 3,
-  aes_color_locations = "",
-  locations_palette = "Set2",
   aes_color_flows = ""
 ) {
 
@@ -61,12 +55,6 @@ plot_map <- function(
     arterial <- spatial$arterial
   } else {
     arterial <- spatial$arterial$edges
-  }
-
-  if(aes_color_locations == "") {
-    locations <- spatial$locations
-  } else {
-    locations <- spatial$locations %>% sf::st_buffer(size_locations * 10)
   }
 
   if(is.null(network)) {
@@ -140,20 +128,14 @@ plot_map <- function(
     } +
     {
       if(add_locations) {
-        ggplot2::geom_sf(
-          data = locations,
+        ggsflabel::geom_sf_label(
+          data = spatial$locations,
           mapping = ggplot2::aes(
             geometry = .data$geometry,
-            fill = !!sym(aes_color_locations)),
-          color = ifelse(aes_color_locations == "", color_locations, NA),
+            label = as.character(.data$id)
+          ),
           size = size_locations
         )
-      }
-    } +
-    {
-      if(aes_color_locations != "") {
-        ggplot2::scale_fill_brewer(palette = locations_palette,
-                                   name = "location")
       }
     } +
     ggplot2::theme(

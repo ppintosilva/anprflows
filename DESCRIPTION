@@ -36,4 +36,7 @@ Imports:
     lazyeval,
     RColorBrewer,
     GGally,
-    purrr
+    purrr,
+    ggsflabel
+Remotes: 
+    yutannihilation/ggsflabel
