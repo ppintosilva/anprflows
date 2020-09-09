@@ -150,17 +150,15 @@ test_that("all paths works, no source sink", {
 
   observed_path_stats <- paths %>%
     group_by(subgraph, path) %>%
-    summarise(N = dplyr::n())
+    summarise(N = dplyr::n(), .groups = "drop")
 
   expected_path_stats <-
     tribble(
       ~subgraph, ~path, ~N,
       #---,---,
-      1, 1, 3, # 77 -> 209 -> 54
-      2, 1, 3  # 133 -> 112 -> 199
-    ) %>%
-    mutate(subgraph = as.character(subgraph)) %>%
-    mutate_if(is.double, as.integer)
+      "1", 1L, 3L, # 77 -> 209 -> 54
+      "2", 1L, 3L  # 133 -> 112 -> 199
+    )
 
   expect_equal(expected_path_stats, observed_path_stats)
 })
@@ -173,7 +171,7 @@ test_that("all paths works, 2ith source sink", {
 
   observed_path_stats <- paths %>%
     group_by(subgraph, path) %>%
-    summarise(N = dplyr::n()) %>%
+    summarise(N = dplyr::n(), .groups = "drop") %>%
     arrange(subgraph, N) %>%
     select(subgraph, N)
 
@@ -193,8 +191,7 @@ test_that("all paths works, 2ith source sink", {
     2, 4, # SOURCE -> 112 -> 199 -> SINK
     2, 5, # SOURCE -> 133 -> 112 -> 199 -> SINK
   ) %>%
-    mutate(subgraph = as.character(subgraph),
-           N = as.integer(N))
+    mutate(subgraph = as.character(subgraph), N = as.integer(N))
 
   expect_equal(expected_path_stats, observed_path_stats)
 })

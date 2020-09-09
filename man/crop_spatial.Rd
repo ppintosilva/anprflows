@@ -2,17 +2,17 @@
 % Please edit documentation in R/wrangle.R
 \name{crop_spatial}
 \alias{crop_spatial}
-\title{Crop spatial features based on flow data.}
+\title{Crop spatial features based on od pairs.}
 \usage{
 crop_spatial(
-  flows_od,
+  pairs,
   spatial,
   arterial_highway = "residential",
-  bbox_margin = c(-250, -250, 250, 250)
+  bbox_margin = c(-500, -500, 500, 500)
 )
 }
 \arguments{
-\item{flows_od}{Trimmed flows$od tibble.}
+\item{pairs}{OD pairs tibble.}
 
 \item{spatial}{List of spatial features.}
 
@@ -25,5 +25,5 @@ highway attribute.}
 [list]
 }
 \description{
-Crop spatial features based on flow data.
+Crop spatial features based on od pairs.
 }

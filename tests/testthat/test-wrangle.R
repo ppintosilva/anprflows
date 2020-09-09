@@ -19,6 +19,7 @@ test_that("two csv files are read well", {
     suppressWarnings(
       dplyr::bind_rows(raw_flows_1, raw_flows_2)
     ) %>%
+    mutate(across(c(o,d), as.character)) %>%
     dplyr::arrange(o,d,t)
 
   character_raw_flows <-
@@ -26,7 +27,8 @@ test_that("two csv files are read well", {
     dplyr::mutate(
       o = as.character(o),
       d = as.character(d)
-    )
+    ) %>%
+    dplyr::arrange(o,d,t)
 
   expect_equal(binded_flows, character_raw_flows)
 })
@@ -52,6 +54,7 @@ test_that("location and od flows are computed well from raw flows", {
 
 test_that("spatial crop works", {
   # test that obtained spatial bbox is smaller than original bbox
+  # in order for this statement to work, we have to first load the sf library
   spatial_raw_flows_1 <-
     suppressWarnings(dplyr::left_join(raw_flows_1, spatial_1$pairs))
 

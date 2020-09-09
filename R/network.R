@@ -268,7 +268,7 @@ all_paths <- function(G) {
     to = source_sink %>% filter(.data$sink) %>% pull(.data$name)
   ) %>%
     # to make sure that levels are used instead of labels
-    dplyr::mutate_if(is.factor, as.character)
+    mutate(across(c(.data$from,.data$to), as.character))
 
   # compute all simple paths for each row (combination of source,sink)
   simple_paths <- purrr::pmap(
@@ -295,7 +295,7 @@ all_paths <- function(G) {
     ) %>%
     bind_rows(.id = "rowname") %>%
     group_by(.data$rowname, .data$path_id) %>%
-    mutate(path = group_indices()) %>%
+    mutate(path = dplyr::cur_group_id()) %>%
     ungroup() %>%
     select(.data$path, .data$segment_label, .data$segment_level) %>%
     arrange(.data$path, .data$segment_label)

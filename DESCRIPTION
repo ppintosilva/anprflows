@@ -11,32 +11,28 @@ Description: Explore and Model Traffic Flows on Road Networks Equipped with ANPR
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 2.1.0),
-    vdiffr,
-    patchwork
+    ggplot2,
+    patchwork,
+    GGally,
+    ggraph,
+    RColorBrewer,
+    munsell,
+    scales
 Imports: 
     rlang,
+    lazyeval,
     dplyr,
     tidyr,
     readr,
-    munsell,
     lubridate,
     forcats,
     assertr,
     sf,
     tibble,
     tidygraph,
-    scales,
     magrittr,
-    ggplot2,
-    ggraph,
     igraph,
-    lazyeval,
-    RColorBrewer,
-    GGally,
-    purrr,
-    ggsflabel
-Remotes: 
-    yutannihilation/ggsflabel
+    purrr

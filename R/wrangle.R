@@ -120,9 +120,9 @@ get_flows_od <- function(
     ungroup()
 }
 
-#' Crop spatial features based on flow data.
+#' Crop spatial features based on od pairs.
 #'
-#' @param flows_od Trimmed flows$od tibble.
+#' @param pairs OD pairs tibble.
 #' @param spatial List of spatial features.
 #' @param arterial_highway Only keep arterial edges with this value in the
 #' highway attribute.
@@ -132,17 +132,15 @@ get_flows_od <- function(
 #' @export
 #'
 crop_spatial <- function(
-  flows_od,
+  pairs,
   spatial,
   arterial_highway = "residential",
-  bbox_margin = c(-250,-250,250,250)
+  bbox_margin = c(-500,-500,500,500)
 ) {
+  col1 <- sym(names(pairs)[1])
+  col2 <- sym(names(pairs)[2])
   # get unique locations observed in the data
-  observed_locations <-
-    union(
-      flows_od %>% distinct(.data$o) %>% pull(.data$o),
-      flows_od %>% distinct(.data$d) %>% pull(.data$d)
-    )
+  observed_locations <- union(pairs[,col1], pairs[,col2])
 
   # subset locations by existing flows
   locations <-
@@ -151,16 +149,16 @@ crop_spatial <- function(
 
   # od combinations
   od_combinations <-
-    flows_od %>%
-    filter(.data$o != "SOURCE", .data$d != "SINK") %>%
-    distinct(.data$o, .data$d)
+    pairs %>%
+    filter({{ col1 }} != "SOURCE", {{ col2 }} != "SINK") %>%
+    distinct({{ col1 }}, {{ col2 }})
 
   pairs <-
     suppressWarnings(
       inner_join(
         spatial$pairs,
         od_combinations,
-        by = c("o" = "o", "d" = "d")
+        by = c("o" = rlang::as_string(col1), "d" = rlang::as_string(col2))
       )
     )
 
@@ -194,7 +192,11 @@ crop_spatial <- function(
     primary <- try_st_crop(spatial$primary$edges, bbox, "primary network")
   }
 
-  amenities <- try_st_crop(spatial$amenities, bbox, "amenities")
+  if('amenities' %in% names(spatial)) {
+    amenities <- try_st_crop(spatial$amenities, bbox, "amenities")
+  } else {
+    amenities <- NULL
+  }
 
   return(
     list(
@@ -383,7 +385,7 @@ cut_flows <- function(
 
     flows_levels <- levels(flows_od$o)
     pairs <- pairs %>%
-      dplyr::mutate_if(is.character, factor, levels = flows_levels)
+      mutate(across(c(.data$o,.data$d), factor, levels = flows_levels))
 
     flows_od <- flows_od %>% inner_join(pairs, by = c("o" = "o", "d" = "d"))
   }
