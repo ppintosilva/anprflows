@@ -35,4 +35,5 @@ Imports:
     tidygraph,
     magrittr,
     igraph,
-    purrr
+    purrr,
+    stringr
