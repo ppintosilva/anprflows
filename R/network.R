@@ -298,5 +298,5 @@ all_paths <- function(G) {
     ungroup() %>%
     select(.data$path, .data$node, .data$node_order) %>%
     arrange(.data$path, .data$node_order) %>%
-    select(-node_order)
+    select(-.data$node_order)
 }
