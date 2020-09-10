@@ -97,3 +97,16 @@ try_st_crop <- function(sf_tibble, bbox, sf_name) {
     return(cropped_sf)
   }
 }
+
+
+#' Simple wrapper around assertthat to assert expected column names
+#'
+#' @param tib a tibble
+#' @param required_cols character vector of columns expected to exist in tib
+#'
+#' @return NULL
+assert_cols <- function(tib, required_cols) {
+  assertthat::assert_that(
+    all(required_cols %in% names(tib)),
+    msg = glue::glue("Input tibble expects the named columns: {required_cols}"))
+}
