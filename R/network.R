@@ -236,8 +236,7 @@ vec_all_paths <- function(Gs) {
     lapply(all_paths) %>%
     bind_rows(.id = "subgraph") %>%
     select(.data$subgraph, everything()) %>%
-    arrange(.data$subgraph, .data$path,
-            .data$segment_label, .data$segment_level)
+    arrange(.data$subgraph, .data$path)
 }
 
 #' Search for all simple paths from source to sink. This is a wrapper around
@@ -287,16 +286,17 @@ all_paths <- function(G) {
     # retrive paths from list and tidy up
     purrr::map(
       function(x) purrr::map(x, names) %>%
-        tibble(segment_level = .) %>%
+        tibble(node = .) %>%
         rownames_to_column(var = "path_id") %>%
-        unnest(.data$segment_level) %>%
+        unnest(.data$node) %>%
         group_by(.data$path_id) %>%
-        mutate(segment_label = row_number())
+        mutate(node_order = row_number())
     ) %>%
     bind_rows(.id = "rowname") %>%
     group_by(.data$rowname, .data$path_id) %>%
     mutate(path = dplyr::cur_group_id()) %>%
     ungroup() %>%
-    select(.data$path, .data$segment_label, .data$segment_level) %>%
-    arrange(.data$path, .data$segment_label)
+    select(.data$path, .data$node, .data$node_order) %>%
+    arrange(.data$path, .data$node_order) %>%
+    select(-node_order)
 }
