@@ -95,6 +95,7 @@ reduce_sequences <- function(seqs) {
 join_sequences <- function(G, trip_sequences, method = "e", sep = ",") {
   assert_tidygraph(G)
   assert_tibble(trip_sequences)
+  assert_cols(trip_sequences, c("s", "n"))
 
   if(method == "e") {
     # find all paths in G and computer their subsequences
@@ -118,7 +119,10 @@ join_sequences <- function(G, trip_sequences, method = "e", sep = ",") {
 
     # inner join paths and sequences
     candidates <-
-      inner_join(paths, seqs, by = "s") %>%
+      # we do not do set intersection here (inner_join) because it may be
+      # useful to list explicitly paths that are not observed at all
+      left_join(paths, seqs, by = "s") %>%
+      mutate(n = replace_na(.data$n, 0L)) %>%
       distinct(.data$s, .data$l, .data$n)
 
   }
@@ -127,4 +131,82 @@ join_sequences <- function(G, trip_sequences, method = "e", sep = ",") {
   }
 
   return(candidates)
+}
+
+#' Calculate the utility loss of each sequence, given the shortest path
+#' distance between each pair of locations.
+#'
+#' @param sequences a tibble of sequences (with columns 's', 'l')
+#' @param distances a tibble of distances (with columns 'o', 'd', 'distance')
+#' @param .keep_distances keep calculated distances as columns
+#'
+#' @return tibble with extra column 'uloss'
+#'
+#' @export
+utility_loss <- function(sequences, distances, .keep_distances = FALSE) {
+  assert_tibble(sequences)
+  assert_tibble(distances)
+  assert_cols(sequences, c("s", "l"))
+  assert_cols(distances, c("o", "d", "distance"))
+
+  sequences %>%
+    # ensure sequences are unique
+    assertr::assert(assertr::is_uniq, .data$s) %>%
+    # retrieve first and last elements of each sequence, so that we can
+    # compute (1) distance between first and last element and (2) the sum of
+    # the distances between each observation pair i,i+1
+    group_by(.data$s) %>%
+    mutate(camera = .data$s) %>%
+    tidyr::separate_rows(.data$camera) %>%
+    # get the i,i+1 pairs
+    mutate(l1 = .data$camera, l2 = lead(.data$camera)) %>%
+    select(-.data$camera) %>%
+    # get the 1st and last elements (OD)
+    mutate(o = dplyr::first(.data$l1), d = dplyr::last(.data$l1)) %>%
+    filter(!is.na(.data$l2)) %>%
+    # join with distances (twice)
+    left_join(
+      distances,
+      by = c("o", "d")
+    ) %>%
+    left_join(
+      distances,
+      by = c("l1" = "o", "l2" = "d"),
+      suffix = c(".od",".el")
+    ) %>%
+    # crunch back sequences into strings
+    summarise(
+      d.od = dplyr::first(.data$distance.od),
+      d.s = sum(.data$distance.el),
+    ) %>%
+    mutate(uloss = abs(1.0 - .data$d.od/.data$d.s)) %>%
+    arrange(.data$s) %>%
+    { if(.keep_distances) . else select(., -starts_with("d.")) } %>%
+    # recover original columns lost in summarise
+    left_join(sequences, by = "s")
+}
+
+#' Calculate the subset of trip sequences which are ordinary.
+#'
+#' @param sequences a tibble of sequences (with columns 's', 'l', 'drate', 'uloss')
+#' @param max_uloss maximum accepted utility loss: sequences with utility loss
+#' above this threshold are rejected.
+#' @param min_drate minimum accepted daily observation rate: sequences observed
+#' at a daily rate below this threshold are rejected.
+#' @param .keep_cols whether to keep cols other than 's' and 'l'
+#'
+#' @return filtered tibble
+#'
+#' @export
+
+ordinary_sequences <- function(sequences, min_drate = 30.0,
+                               max_uloss = .25, .keep_cols = FALSE) {
+  assert_tibble(sequences)
+  assert_cols(sequences, c("s", "l", "drate", "uloss"))
+
+  sequences %>%
+    filter(.data$drate > min_drate & .data$uloss < max_uloss) %>%
+    {
+      if(.keep_cols) . else select(., .data$s, .data$l)
+    }
 }

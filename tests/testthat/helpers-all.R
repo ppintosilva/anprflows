@@ -91,3 +91,29 @@ mock_trip_sequences <- tibble::tribble(
   "133,112", 500L,
   "112,199", 500L
 )
+
+mock_distances <- tibble::tribble(
+  ~o, ~d, ~distance,
+  "77", "209", 3000,
+  "209", "54", 1500,
+  "77", "54", 4000,
+  "133", "112", 950,
+  "112", "199", 1700,
+  "133", "199", 1200
+)
+
+mock_joined_sequences <-
+  join_sequences(G_asympt, mock_trip_sequences, method = "e") %>%
+  arrange(s)
+
+mock_observed_days <- 2
+
+mock_pre_ordinary_sequences <-
+  mock_joined_sequences %>%
+  utility_loss(mock_distances) %>%
+  mutate(drate = n/mock_observed_days, .keep = "unused") %>%
+  select(s, l, drate, uloss)
+
+mock_ordinary_sequences <-
+  mock_pre_ordinary_sequences %>%
+  ordinary_sequences(min_drate = 30.0, max_uloss = .25)
