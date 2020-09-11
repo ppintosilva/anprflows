@@ -1,4 +1,35 @@
-context("wrangle")
+raw_flows_1 <- read_flows_csv(filenames = test1_filename)
+raw_flows_2 <- read_flows_csv(filenames = test2_filename)
+
+flows_l_1 <- get_flows_l(raw_flows_1)
+flows_od_1 <- get_flows_od(raw_flows_1, flows_l_1)
+
+asympt_flows_l_1 <- get_flows_l(raw_flows_1,
+                                by_period = FALSE)
+
+asympt_flows_od_1 <- get_flows_od(raw_flows_1, asympt_flows_l_1,
+                                  by_period = FALSE)
+
+
+# cut flows
+segment_77_209_gaps <- cut_flows(
+  flows_od, flows_l,
+  time_resolution = "15 min",
+  pairs = tibble(o = "77", d = "209"),
+  fill_gaps = FALSE)
+
+segment_77_209_extra_row <-
+  tibble(l = factor("77", levels(flows_od$o)),
+         t = lubridate::ymd_hms("2018-01-02 10:00:00"),
+         flow = 23, type = "in")
+
+
+segment_77_209_nogaps <- cut_flows(
+  flows_od,
+  suppressWarnings(bind_rows(flows_l, segment_77_209_extra_row)),
+  time_resolution = "15 min",
+  pairs = tibble(o = "77", d = "209"),
+  fill_gaps = TRUE)
 
 test_that("single csv files are read well", {
   expected_names <-
@@ -50,42 +81,6 @@ test_that("location and od flows are computed well from raw flows", {
       "median_speed", "mean_speed", "sd_speed")
 
   expect_equal(names(flows_od), expected_names_od)
-})
-
-test_that("spatial crop works", {
-  # test that obtained spatial bbox is smaller than original bbox
-  # in order for this statement to work, we have to first load the sf library
-  spatial_raw_flows_1 <-
-    suppressWarnings(dplyr::left_join(raw_flows_1, spatial_1$pairs))
-
-  subspatial_1 <-
-    spatial_raw_flows_1 %>%
-    crop_spatial(spatial_1, bbox_margin = c(-50,-50,50,50))
-
-  # don't compares bboxes of locations and pairs because these are the
-  # same in this test case
-  old_bboxes <- sapply(spatial_1, sf::st_bbox)[,3:5]
-  new_bboxes <- sapply(subspatial_1, sf::st_bbox)[,3:5]
-
-  # xmin and ymin of new bounding boxes should be GREATER (smaller bbox)
-  # than xmin and ymin of older (larger) bounding boxes
-  expect_true(
-    sapply(1:3, function(i) # all cols of new spatial
-      sapply(1:2, function(j) # get xmin and ymin
-        new_bboxes[j,i] > old_bboxes[j,i]
-      )
-    ) %>% all()
-  )
-
-  # xmax and ymax of new bounding boxes should be SMALLER (smaller bbox)
-  # than xmax and ymax of older (larger) bounding boxes
-  expect_true(
-    sapply(1:3, function(i) # all cols of new spatial
-      sapply(3:4, function(j) # get xmax and ymax
-        new_bboxes[j,i] < old_bboxes[j,i]
-      )
-    ) %>% all()
-  )
 })
 
 test_that("top flows work", {

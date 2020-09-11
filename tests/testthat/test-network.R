@@ -1,5 +1,22 @@
 # tests ----
 
+raw_flows_1 <- read_flows_csv(filenames = test1_filename)
+
+flows_l_1 <- get_flows_l(raw_flows_1)
+flows_od_1 <- get_flows_od(raw_flows_1, flows_l_1)
+
+asympt_flows_l_1 <- get_flows_l(raw_flows_1,
+                                by_period = FALSE)
+
+asympt_flows_od_1 <- get_flows_od(raw_flows_1, asympt_flows_l_1,
+                                  by_period = FALSE)
+
+G1_asympt <- flow_network(
+  asympt_flows_od_1,
+  label_subgraphs = TRUE,
+  spurious_if_below = c("rate_o" = .10)
+)
+
 test_that("factor levels before and after are the same", {
   # test that flow network factors remain the same
   levels_before <- levels(asympt_flows_od$o)
