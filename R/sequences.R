@@ -6,32 +6,34 @@
 #' "A,B", "B,C", "C,D", "A,B,C", "B,C,D", "A,B,C,D"
 #'
 #' @param seqs a tibble with named column "s": sequence
-#' @param separator character separating each element in the sequence
+#' @param sep character separating each element in the sequence
 #'
 #' @return expanded tibble, with additional column "l" specifying the length of
 #' the sequence
 #' @export
 #'
-expand_sequences <- function(seqs, separator = ",") {
+expand_sequences <- function(seqs, sep = ",") {
   assert_cols(seqs, c("s"))
 
-  seqs <- seqs %>%
-    mutate(l = stringr::str_count(.data$s, separator) + 1)
+  if(!"l" %in% names(seqs)) {
+    seqs <- seqs %>%
+      mutate(l = stringr::str_count(.data$s, sep) + 1L)
+  }
 
   seqs %>%
-    group_by(.data$l >= 3) %>%
+    group_by(.data$l >= 3L) %>%
     group_map(~{
       if(.y == TRUE) {
         .x %>%
           rowwise() %>%
           # subsequences of length r = 2..l
-          mutate(r = list(seq(from = .data$l, to = 2, by = -1))) %>%
+          mutate(r = list(seq(from = .data$l, to = 2L, by = -1L))) %>%
           unchop(.data$r) %>%
           rowwise() %>%
           # start and end character indices for each subsequence of length r
           mutate(
-            i = list(seq(from = 1, to = .data$l-.data$r+1, by = 1)),
-            j = list(seq(from = .data$r, to = .data$l, by = 1))
+            i = list(seq(from = 1L, to = .data$l-.data$r+1, by = 1L)),
+            j = list(seq(from = .data$r, to = .data$l, by = 1L))
           ) %>%
           unchop(c(.data$i, .data$j)) %>%
           rowwise() %>%
@@ -43,7 +45,7 @@ expand_sequences <- function(seqs, separator = ",") {
           #   str_flatten - paste the character vector back into a single string
           mutate(
             s = str_flatten((str_split(.data$s, ",")[[1]][c(i:j)]), ","),
-            l = r
+            l = .data$r
           ) %>%
           select(-c(i,j,r))
       }
@@ -72,4 +74,57 @@ reduce_sequences <- function(seqs) {
       l = dplyr::first(.data$l),
       .groups = "drop"
     )
+}
+
+#' Obtain the set of observed sequences from a trip dataset, the set of
+#' theoretically possible sequences given an ANPR network and compute the
+#' set intersection of the two.
+#'
+#' @param G tidygraph of a ANPR network
+#' @param trip_sequences tibble of observed trip sequences
+#' @param method method to determine the set of possible trip sequences from
+#' a ANPR network. If the network is relatively sparse and of small size then
+#' this set can be compute exhaustively (method = "e"). Otherwise if the
+#' network is too large and it becomes computationally infeasible to compute the
+#' set, we use a heuristic (method = "h") to approximate the resulting subset.
+#' @param sep character separating elements of a sequence encoded as a string
+#'
+#' @return a tibble of sequences and their counts
+#' @export
+#'
+join_sequences <- function(G, trip_sequences, method = "e", sep = ",") {
+  assert_tidygraph(G)
+  assert_tibble(trip_sequences)
+
+  if(method == "e") {
+    # find all paths in G and computer their subsequences
+    paths <- all_paths(G) %>%
+      filter(.data$node != "SOURCE" & .data$node != "SINK") %>%
+      group_by(.data$path) %>%
+      summarise(
+        s = stringr::str_c(.data$node, collapse = sep),
+        l = n(),
+        .groups = "drop"
+      ) %>%
+      filter(.data$l > 1L) %>%
+      expand_sequences(sep = sep)
+
+    # compute and reduce subsequences from list of sequences
+    seqs <- trip_sequences %>%
+      expand_sequences(sep = sep) %>%
+      reduce_sequences() %>%
+      arrange(.data$s, .data$n) %>%
+      select(-.data$l)
+
+    # inner join paths and sequences
+    candidates <-
+      inner_join(paths, seqs, by = "s") %>%
+      distinct(.data$s, .data$l, .data$n)
+
+  }
+  else if(method == "h") {
+    stop("Not implemented yet.")
+  }
+
+  return(candidates)
 }

@@ -64,8 +64,27 @@ test_that("sequences tibble is reduced correctly", {
     s = expected_s,
     n = expected_n
   ) %>%
-    mutate(l = stringr::str_count(s, ",") + 1) %>%
+    mutate(l = stringr::str_count(s, ",") + 1L) %>%
     arrange(s,n)
 
   expect_equal(reduced_sequences, expected_tibble)
 })
+
+test_that("sequences are joined correct (method exhaustive)", {
+  expected_tibble <- tribble(
+    ~s, ~l, ~n,
+    "112,199", 2L, 500L,
+    "77,209", 2L, 200L + 400L,
+    "209,54", 2L, 200L + 400L,
+    "133,112", 2L, 500L,
+    "77,209,54", 3L, 200L
+  ) %>%
+    arrange(s)
+
+  observed_candidates <-
+    join_sequences(G_asympt, mock_trip_sequences, method = "e") %>%
+    arrange(s)
+
+  expect_equal(observed_candidates, expected_tibble)
+})
+

@@ -4,10 +4,10 @@
 \alias{assert_cols}
 \title{Assert that cols are present in input tibble}
 \usage{
-assert_cols(tib, required_cols)
+assert_cols(x, required_cols)
 }
 \arguments{
-\item{tib}{a tibble}
+\item{x}{a tibble}
 
 \item{required_cols}{character vector of columns expected to exist in tib}
 }

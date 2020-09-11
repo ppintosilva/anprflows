@@ -1,12 +1,12 @@
 #' Assert that cols are present in input tibble
 #'
-#' @param tib a tibble
+#' @param x a tibble
 #' @param required_cols character vector of columns expected to exist in tib
 #'
 #' @return logical if assert is true
-assert_cols <- function(tib, required_cols) {
+assert_cols <- function(x, required_cols) {
   assertthat::assert_that(
-    all(required_cols %in% names(tib)),
+    all(required_cols %in% names(x)),
     msg = glue::glue("Input tibble expects the named columns: {required_cols}"))
 }
 

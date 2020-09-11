@@ -5,7 +5,7 @@
 #' @importFrom dplyr distinct pull summarise inner_join full_join everything
 #' @importFrom dplyr bind_rows sym if_else left_join slice anti_join starts_with
 #' @importFrom dplyr enquo lag lead quo enquo row_number across rowwise
-#' @importFrom dplyr group_map
+#' @importFrom dplyr group_map n
 #' @importFrom tidyr pivot_longer pivot_wider replace_na unite unnest
 #' @importFrom tidyr unchop chop
 #' @importFrom tidygraph as_tbl_graph activate

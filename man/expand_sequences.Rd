@@ -5,12 +5,12 @@
 \title{Expand any trip sequence of length 3 or greater, with their subsequences
 of length 2 or greater.}
 \usage{
-expand_sequences(seqs, separator = ",")
+expand_sequences(seqs, sep = ",")
 }
 \arguments{
 \item{seqs}{a tibble with named column "s": sequence}
 
-\item{separator}{character separating each element in the sequence}
+\item{sep}{character separating each element in the sequence}
 }
 \value{
 expanded tibble, with additional column "l" specifying the length of

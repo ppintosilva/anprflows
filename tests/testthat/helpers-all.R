@@ -81,3 +81,13 @@ segment_77_209_nogaps <- cut_flows(
   time_resolution = "15 min",
   pairs = tibble(o = "77", d = "209"),
   fill_gaps = TRUE)
+
+
+mock_trip_sequences <- tibble::tribble(
+  ~s, ~n,
+  "77,209", 400L,
+  "209,54", 400L,
+  "77,209,54", 200L,
+  "133,112", 500L,
+  "112,199", 500L
+)
