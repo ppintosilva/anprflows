@@ -60,6 +60,7 @@ crop_spatial <- function(
     {
       if(!is.null(arterial_highway))
         filter(., .data$highway == arterial_highway)
+      else .
     }
 
   # looking for primary network data in
