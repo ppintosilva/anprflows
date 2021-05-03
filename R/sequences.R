@@ -140,10 +140,10 @@ join_sequences <- function(G, trip_sequences, method = "e", sep = ",") {
 #' @param distances a tibble of distances (with columns 'o', 'd', 'distance')
 #' @param .keep_distances keep calculated distances as columns
 #'
-#' @return tibble with extra column 'uloss'
+#' @return tibble with extra column 'utility'
 #'
 #' @export
-utility_loss <- function(sequences, distances, .keep_distances = FALSE) {
+route_utility <- function(sequences, distances, .keep_distances = FALSE) {
   assert_tibble(sequences)
   assert_tibble(distances)
   assert_cols(sequences, c("s", "l"))
@@ -179,7 +179,7 @@ utility_loss <- function(sequences, distances, .keep_distances = FALSE) {
       d.od = dplyr::first(.data$distance.od),
       d.s = sum(.data$distance.el),
     ) %>%
-    mutate(uloss = abs(1.0 - .data$d.od/.data$d.s)) %>%
+    mutate(utility = .data$d.od/.data$d.s) %>%
     arrange(.data$s) %>%
     { if(.keep_distances) . else select(., -starts_with("d.")) } %>%
     # recover original columns lost in summarise
@@ -188,10 +188,9 @@ utility_loss <- function(sequences, distances, .keep_distances = FALSE) {
 
 #' Calculate the subset of trip sequences which are ordinary.
 #'
-#' @param sequences a tibble of sequences (with columns 's', 'l', 'drate', 'uloss')
-#' @param max_uloss maximum accepted utility loss: sequences with utility loss
-#' above this threshold are rejected.
-#' @param min_drate minimum accepted daily observation rate: sequences observed
+#' @param sequences a tibble of sequences (with columns 's', 'l', 'rate', 'utility')
+#' @param min_utility minimum accepted route utility
+#' @param min_rate minimum accepted daily observation rate: sequences observed
 #' at a daily rate below this threshold are rejected.
 #' @param .keep_cols whether to keep cols other than 's' and 'l'
 #'
@@ -199,13 +198,16 @@ utility_loss <- function(sequences, distances, .keep_distances = FALSE) {
 #'
 #' @export
 
-ordinary_sequences <- function(sequences, min_drate = 30.0,
-                               max_uloss = .25, .keep_cols = FALSE) {
+ordinary_sequences <- function(sequences,
+                               # G,
+                               min_rate = 30.0,
+                               min_utility = .70,
+                               .keep_cols = FALSE) {
   assert_tibble(sequences)
-  assert_cols(sequences, c("s", "l", "drate", "uloss"))
+  assert_cols(sequences, c("s", "l", "rate", "utility"))
 
   sequences %>%
-    filter(.data$drate > min_drate & .data$uloss < max_uloss) %>%
+    filter(.data$rate > min_rate & .data$utility > min_utility) %>%
     {
       if(.keep_cols) . else select(., .data$s, .data$l)
     }

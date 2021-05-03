@@ -6,19 +6,18 @@
 \usage{
 ordinary_sequences(
   sequences,
-  min_drate = 30,
-  max_uloss = 0.25,
+  min_rate = 30,
+  min_utility = 0.7,
   .keep_cols = FALSE
 )
 }
 \arguments{
-\item{sequences}{a tibble of sequences (with columns 's', 'l', 'drate', 'uloss')}
+\item{sequences}{a tibble of sequences (with columns 's', 'l', 'rate', 'utility')}
 
-\item{min_drate}{minimum accepted daily observation rate: sequences observed
+\item{min_rate}{minimum accepted daily observation rate: sequences observed
 at a daily rate below this threshold are rejected.}
 
-\item{max_uloss}{maximum accepted utility loss: sequences with utility loss
-above this threshold are rejected.}
+\item{min_utility}{minimum accepted route utility}
 
 \item{.keep_cols}{whether to keep cols other than 's' and 'l'}
 }

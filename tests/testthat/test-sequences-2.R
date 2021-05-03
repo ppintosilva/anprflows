@@ -27,13 +27,13 @@ observed_days <- 2
 
 pre_ordinary_sequences <-
   joined_sequences %>%
-  utility_loss(distances) %>%
-  mutate(drate = n/observed_days, .keep = "unused") %>%
-  select(s, l, drate, uloss)
+  route_utility(distances) %>%
+  mutate(rate = n/observed_days, .keep = "unused") %>%
+  select(s, l, rate, utility)
 
 result_ordinary_sequences <-
   pre_ordinary_sequences %>%
-  ordinary_sequences(min_drate = 30.0, max_uloss = .25)
+  ordinary_sequences(min_rate = 30.0, min_utility = .75)
 
 # ----
 
@@ -53,24 +53,24 @@ test_that("sequences are joined correct (method exhaustive)", {
 })
 
 test_that("utility loss works correctly", {
-  observed_loss_l2 <-
+  observed_l2 <-
     pre_ordinary_sequences %>%
     filter(l == 2) %>%
-    pull(uloss)
+    pull(utility)
 
-  observed_loss_77_209_54 <-
+  observed_77_209_54 <-
     pre_ordinary_sequences %>%
     filter(s == "77,209,54") %>%
-    pull(uloss)
+    pull(utility)
 
-  observed_loss_133_112_199 <-
+  observed_133_112_199 <-
     pre_ordinary_sequences %>%
     filter(s == "133,112,199") %>%
-    pull(uloss)
+    pull(utility)
 
-  purrr::walk(observed_loss_l2, ~ expect_lt(.x, 1e-06))
-  expect_lt(abs(observed_loss_77_209_54 - (1-4000/4500)), 1e-06)
-  expect_lt(abs(observed_loss_133_112_199 - (1-1200/2650)), 1e-06)
+  purrr::walk(observed_l2, ~ expect_lt(.x-1, 1e-06))
+  expect_lt(abs(observed_77_209_54 - 4000/4500), 1e-06)
+  expect_lt(abs(observed_133_112_199 - 1200/2650), 1e-06)
 })
 
 test_that("ordinary sequences are computed correctly", {
