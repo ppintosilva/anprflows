@@ -199,7 +199,7 @@ route_utility <- function(sequences, distances, .keep_distances = FALSE) {
 #' @export
 
 ordinary_sequences <- function(sequences,
-                               # G,
+                               G,
                                min_rate = 30.0,
                                min_utility = .70,
                                .keep_cols = FALSE) {
@@ -207,7 +207,13 @@ ordinary_sequences <- function(sequences,
   assert_cols(sequences, c("s", "l", "rate", "utility"))
 
   sequences %>%
-    filter(.data$rate > min_rate & .data$utility > min_utility) %>%
+    mutate(is_path = purrr::map_lgl(s, ~{
+      is_simple_path(
+        G,
+        stringr::str_split(.x, pattern = ",") %>% purrr::pluck(1))
+
+    })) %>%
+    filter(.data$is_path & .data$rate > min_rate & .data$utility > min_utility) %>%
     {
       if(.keep_cols) . else select(., .data$s, .data$l)
     }

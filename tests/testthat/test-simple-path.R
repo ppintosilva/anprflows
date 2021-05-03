@@ -9,7 +9,7 @@ G_edges <-
 G <- igraph::graph_from_data_frame(G_edges)
 
 
-test_that("multiplication works", {
+test_that("simple path works", {
   testthat::expect_true(
     is_simple_path(G, c("77","209","54"))
   )

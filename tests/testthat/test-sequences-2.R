@@ -6,7 +6,8 @@ trip_sequences <- tibble::tribble(
   "209,54", 400L,
   "77,209,54", 200L,
   "133,112", 500L,
-  "112,199", 500L
+  "112,199", 500L,
+  "133,77,199", 5L
 )
 
 distances <- tibble::tribble(
@@ -19,21 +20,31 @@ distances <- tibble::tribble(
   "133", "199", 1200
 )
 
-joined_sequences <-
-  join_sequences(G_asympt, trip_sequences, method = "e") %>%
-  arrange(s)
+# joined_sequences <-
+#   join_sequences(G_asympt, trip_sequences, method = "e") %>%
+#   arrange(s)
 
 observed_days <- 2
 
+G_edges <-
+  asympt_flows_od %>%
+  filter(o != "SOURCE") %>%
+  filter(d != "SINK") %>%
+  select(o,d)
+
+G <- igraph::graph_from_data_frame(G_edges)
+
 pre_ordinary_sequences <-
-  joined_sequences %>%
+  trip_sequences %>%
+  expand_sequences() %>%
+  reduce_sequences() %>%
   route_utility(distances) %>%
   mutate(rate = n/observed_days, .keep = "unused") %>%
   select(s, l, rate, utility)
 
 result_ordinary_sequences <-
   pre_ordinary_sequences %>%
-  ordinary_sequences(min_rate = 30.0, min_utility = .75)
+  ordinary_sequences(G, min_rate = 30.0, min_utility = .75)
 
 # ----
 
@@ -49,28 +60,29 @@ test_that("sequences are joined correct (method exhaustive)", {
   ) %>%
     arrange(s)
 
+  joined_sequences <- join_sequences(G_asympt, trip_sequences, method = "e") %>% arrange(s)
+
   expect_equal(joined_sequences, expected_tibble)
 })
 
 test_that("utility loss works correctly", {
-  observed_l2 <-
+  utility_l2 <-
     pre_ordinary_sequences %>%
-    filter(l == 2) %>%
+    filter(l == 2 & !is.na(utility)) %>%
     pull(utility)
 
-  observed_77_209_54 <-
+  utility_77_209_54 <-
     pre_ordinary_sequences %>%
     filter(s == "77,209,54") %>%
     pull(utility)
 
-  observed_133_112_199 <-
-    pre_ordinary_sequences %>%
-    filter(s == "133,112,199") %>%
+  utility_133_112_199 <-
+    route_utility(tibble(s = "133,112,199", l = 3), distances) %>%
     pull(utility)
 
-  purrr::walk(observed_l2, ~ expect_lt(.x-1, 1e-06))
-  expect_lt(abs(observed_77_209_54 - 4000/4500), 1e-06)
-  expect_lt(abs(observed_133_112_199 - 1200/2650), 1e-06)
+  purrr::walk(utility_l2, ~ expect_lt(.x-1, 1e-06))
+  expect_lt(abs(utility_77_209_54 - 4000/4500), 1e-06)
+  expect_lt(abs(utility_133_112_199 - 1200/2650), 1e-06)
 })
 
 test_that("ordinary sequences are computed correctly", {

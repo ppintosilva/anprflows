@@ -6,6 +6,7 @@
 \usage{
 ordinary_sequences(
   sequences,
+  G,
   min_rate = 30,
   min_utility = 0.7,
   .keep_cols = FALSE
