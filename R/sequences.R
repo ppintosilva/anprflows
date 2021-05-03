@@ -183,12 +183,13 @@ route_utility <- function(sequences, distances, .keep_distances = FALSE) {
     arrange(.data$s) %>%
     { if(.keep_distances) . else select(., -starts_with("d.")) } %>%
     # recover original columns lost in summarise
-    left_join(sequences, by = "s")
+    full_join(sequences, by = "s")
 }
 
 #' Calculate the subset of trip sequences which are ordinary.
 #'
 #' @param sequences a tibble of sequences (with columns 's', 'l', 'rate', 'utility')
+#' @param G igraph object representing the ANPR flow network
 #' @param min_utility minimum accepted route utility
 #' @param min_rate minimum accepted daily observation rate: sequences observed
 #' at a daily rate below this threshold are rejected.
@@ -200,14 +201,14 @@ route_utility <- function(sequences, distances, .keep_distances = FALSE) {
 
 ordinary_sequences <- function(sequences,
                                G,
-                               min_rate = 30.0,
-                               min_utility = .70,
+                               min_rate,
+                               min_utility,
                                .keep_cols = FALSE) {
   assert_tibble(sequences)
   assert_cols(sequences, c("s", "l", "rate", "utility"))
 
   sequences %>%
-    mutate(is_path = purrr::map_lgl(s, ~{
+    mutate(is_path = purrr::map_lgl(.data$s, ~{
       is_simple_path(
         G,
         stringr::str_split(.x, pattern = ",") %>% purrr::pluck(1))
@@ -217,4 +218,97 @@ ordinary_sequences <- function(sequences,
     {
       if(.keep_cols) . else select(., .data$s, .data$l)
     }
+}
+
+
+#' Compute corridor set from ordinary sequences
+#'
+#' @param ord_sequences tibble of ordinary sequences
+#'
+#' @return tibble of corridors
+#' @export
+#'
+get_corridor_set <- function(ord_sequences) {
+
+  super_sequences <-
+    tibble(
+      s1 = ord_sequences$s,
+      s2 = ord_sequences$s
+    ) %>%
+    tidyr::expand(.data$s1,.data$s2) %>%
+    filter(.data$s1 != .data$s2) %>%
+    mutate(is_subset = stringr::str_detect(.data$s2,.data$s1)) %>%
+    group_by(.data$s1) %>%
+    summarise(subset_count = sum(.data$is_subset)) %>%
+    filter(.data$subset_count == 0) %>%
+    pull(.data$s1)
+
+
+  corridor_ids <-
+    tibble(
+      s1 = super_sequences,
+      s2 = super_sequences
+    ) %>%
+    tidyr::expand(.data$s1,.data$s2) %>%
+    filter(.data$s1 != .data$s2) %>%
+    mutate(
+      o1 = stringr::str_sub(.data$s1,1,1),
+      # o2 = stringr::str_sub(s2,1,1),
+      d1 = stringr::str_sub(.data$s1, -1),
+      # d2 = stringr::str_sub(s2, -1)
+    ) %>%
+    # filter(o1 == o2 & d1 == d2) %>%
+    distinct(.data$o1,.data$d1) %>%
+    mutate(corridor = row_number())
+
+
+  corridors <-  tibble(
+    s = super_sequences
+  ) %>%
+    mutate(i = row_number()) %>%
+    mutate(
+      o1 = stringr::str_sub(.data$s,1,1),
+      d1 = stringr::str_sub(.data$s, -1),
+    ) %>%
+    inner_join(corridor_ids, by = c("o1" ,"d1")) %>%
+    select(-c(.data$o1,.data$d1)) %>%
+    tidyr::separate_rows(.data$s, sep = ",") %>%
+    group_by(.data$i) %>%
+    mutate(d = lead(.data$s)) %>%
+    filter(!is.na(.data$d)) %>%
+    rename(o = .data$s) %>%
+    ungroup() %>%
+    select(.data$corridor,.data$o, .data$d) %>%
+    distinct(.data$corridor, .data$o, .data$d, .keep_all = T) %>%
+    arrange(.data$corridor)
+
+  return(corridors)
+}
+
+
+#' Get corridors from observed sequences (wrapper)
+#'
+#' @param observed_sequences observed trip sequences as strings
+#' @param distances distances tibble
+#' @param ndays total number of observed days
+#' @param G ANPR flow network igraph
+#' @param min_rate minimum observed daily rate
+#' @param min_utility minimum route utility
+#'
+#' @return identified ANPR corridors tibble
+#' @export
+#'
+get_corridors <- function(observed_sequences, distances, ndays, G, min_rate, min_utility) {
+
+  observed_sequences %>%
+    expand_sequences() %>%
+    reduce_sequences() %>%
+    route_utility(distances, .keep_distances = F) %>%
+    mutate(rate = .data$n/ndays) %>%
+    ordinary_sequences(
+      G = G,
+      min_rate = min_rate,
+      min_utility = min_utility
+    ) %>%
+    get_corridor_set()
 }

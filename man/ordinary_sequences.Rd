@@ -4,16 +4,12 @@
 \alias{ordinary_sequences}
 \title{Calculate the subset of trip sequences which are ordinary.}
 \usage{
-ordinary_sequences(
-  sequences,
-  G,
-  min_rate = 30,
-  min_utility = 0.7,
-  .keep_cols = FALSE
-)
+ordinary_sequences(sequences, G, min_rate, min_utility, .keep_cols = FALSE)
 }
 \arguments{
 \item{sequences}{a tibble of sequences (with columns 's', 'l', 'rate', 'utility')}
+
+\item{G}{igraph object representing the ANPR flow network}
 
 \item{min_rate}{minimum accepted daily observation rate: sequences observed
 at a daily rate below this threshold are rejected.}
