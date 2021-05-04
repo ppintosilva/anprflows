@@ -1,3 +1,31 @@
+#' Get and count trip sequences
+#'
+#' @param df trips dataset with three columns: (k,i,x) i-th trip of vehicle k is sequence of x's
+#' @param sep sequence separator character
+#'
+#' @return tibble with columns (s = sequence, l = length of sequence, n = count)
+#' @export
+#'
+count_sequences <- function(df, sep = ",") {
+  col1 <- sym(names(df)[1])
+  col2 <- sym(names(df)[2])
+  col3 <- sym(names(df)[3])
+
+  df %>%
+    group_by({{ col1 }}, {{ col2 }}) %>%
+    summarise(
+      s = stringr::str_c({{ col3 }}, collapse = sep),
+      l = n()
+    ) %>%
+    group_by(.data$l,.data$s) %>%
+    summarise(
+      n = n()
+    ) %>%
+    select(.data$s, .data$l, .data$n) %>%
+    filter(.data$l > 1)
+}
+
+
 #' Expand any trip sequence of length 3 or greater, with their subsequences
 #' of length 2 or greater.
 #'

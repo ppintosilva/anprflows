@@ -2,6 +2,7 @@
 
 export("%>%")
 export(all_paths)
+export(count_sequences)
 export(crop_spatial)
 export(cut_flows)
 export(dayperiod)
