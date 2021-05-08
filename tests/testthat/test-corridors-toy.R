@@ -40,7 +40,8 @@ flow_graph_edges <- tribble(
   "D", "E",
   "D", "F",
   "F", "G",
-  "B", "F"
+  "B", "F",
+  "D", "G"
 ) %>%
   mutate(route = row_number()) %>%
   unite("route_label", from, to , sep = " -> ", remove = F) %>%
@@ -68,21 +69,19 @@ distances <-
 
 # build corridor set
 
-expected_corridors <- tribble(
-  ~corridor, ~route,
-  1L, 1,
-  1L, 2,
-  2L, 1,
-  2L, 4,
-  3L, 3,
-  3L, 6,
-  3L, 7,
-  3L, 8,
-  4L, 5
-) %>%
-  inner_join(flow_graph_edges %>% select(from,to,route), by = "route") %>%
-  rename(o = from, d = to) %>%
-  select(corridor, o, d)
+expected_corridors <- tibble::tribble(
+  ~corridor,  ~o,  ~d,
+  1L, "B", "D",
+  1L, "B", "F",
+  1L, "D", "F",
+  1L, "F", "G",
+  1L, "D", "G",
+  2L, "A", "B",
+  2L, "B", "C",
+  3L, "A", "B",
+  3L, "B", "E",
+  4L, "D", "E"
+)
 
 
 Gtoy <- igraph::graph_from_data_frame(flow_graph_edges %>% select(from,to))
@@ -104,6 +103,7 @@ observed_sequences <- tibble::tribble(
   "B,F", 50L,
   "B,F,G", 100L,
   "B,D,F,G", 100L,
+  "D,G", 100L,
   # bad ones
   "D,E,G", 10L,
   "B,E,G", 10L,
@@ -128,7 +128,9 @@ toy_corridors <- get_corridor_set(toy_ordinary_sequences)
 
 test_that("toy corridors are computed as expected", {
 
-  expect_equal(toy_corridors, expected_corridors)
+  expect_equal(toy_corridors %>% arrange(corridor,o,d),
+               expected_corridors %>% arrange(corridor,o,d))
+
 })
 
 test_that("corridors wrapper works", {
@@ -141,5 +143,6 @@ test_that("corridors wrapper works", {
     min_utility = 0.75
   )
 
-  expect_equal(computed_corridors, expected_corridors)
+  expect_equal(computed_corridors %>% arrange(corridor,o,d),
+               expected_corridors %>% arrange(corridor,o,d))
 })

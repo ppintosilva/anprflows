@@ -272,43 +272,123 @@ get_corridor_set <- function(ord_sequences) {
     pull(.data$s1)
 
 
-  corridor_ids <-
-    tibble(
+  groups_super_sequences <-   tibble(
       s1 = super_sequences,
       s2 = super_sequences
     ) %>%
     tidyr::expand(.data$s1,.data$s2) %>%
     filter(.data$s1 != .data$s2) %>%
     mutate(
-      o1 = stringr::str_sub(.data$s1,1,1),
-      # o2 = stringr::str_sub(s2,1,1),
-      d1 = stringr::str_sub(.data$s1, -1),
-      # d2 = stringr::str_sub(s2, -1)
+      o1 = purrr::map_chr(.data$s1, ~ seq_first(.x)),
+      d1 = purrr::map_chr(.data$s1, ~ seq_last(.x)),
+      o2 = purrr::map_chr(.data$s2, ~ seq_first(.x)),
+      d2 = purrr::map_chr(.data$s2, ~ seq_last(.x))
     ) %>%
-    # filter(o1 == o2 & d1 == d2) %>%
-    distinct(.data$o1,.data$d1) %>%
-    mutate(corridor = row_number())
-
-
-  corridors <-  tibble(
-    s = super_sequences
-  ) %>%
-    mutate(i = row_number()) %>%
     mutate(
-      o1 = stringr::str_sub(.data$s,1,1),
-      d1 = stringr::str_sub(.data$s, -1),
+      same_od = (.data$o1 == .data$o2 & .data$d1 == .data$d2),
+      s2_has_o1 = purrr::map2_lgl(.x = .data$s2, .y = .data$o1, ~ .y %in% seq_split(.x)),
+      s2_has_d1 = purrr::map2_lgl(.x = .data$s2, .y = .data$d1, ~ .y %in% seq_split(.x)),
+      has_od = .data$s2_has_o1 & .data$s2_has_d1
     ) %>%
-    inner_join(corridor_ids, by = c("o1" ,"d1")) %>%
-    select(-c(.data$o1,.data$d1)) %>%
+    filter(.data$same_od | .data$has_od) %>%
+    group_by(.data$o2,.data$d2) %>%
+    mutate(i = dplyr::cur_group_id()) %>%
+    group_by(.data$i) %>%
+    dplyr::group_modify(~{
+      tibble(
+        s = union(.x$s1, .x$s2)
+      )
+    })
+
+  # tmp2 <- tmp %>% filter(same_od | has_od) %>% group_by(o2,d2) %>%
+
+  corridors <-
+    tibble(
+      s = super_sequences
+    ) %>%
+    anti_join(groups_super_sequences, by = "s") %>%
+    mutate(i = 100000L + row_number()) %>%
+    bind_rows(groups_super_sequences) %>%
+    group_by(.data$i) %>%
+    mutate(corridor = dplyr::cur_group_id()) %>%
+    ungroup() %>%
+    mutate(i = row_number()) %>%
     tidyr::separate_rows(.data$s, sep = ",") %>%
     group_by(.data$i) %>%
-    mutate(d = lead(.data$s)) %>%
-    filter(!is.na(.data$d)) %>%
-    rename(o = .data$s) %>%
+    mutate(x2 = lead(.data$s)) %>%
     ungroup() %>%
-    select(.data$corridor,.data$o, .data$d) %>%
-    distinct(.data$corridor, .data$o, .data$d, .keep_all = T) %>%
+    filter(!is.na(.data$x2)) %>%
+    rename(x1 = .data$s) %>%
+    distinct(.data$corridor, .data$x1, .data$x2) %>%
+    select(.data$corridor, .data$x1, .data$x2) %>%
+    rename(o = .data$x1, d = .data$x2) %>%
     arrange(.data$corridor)
+
+
+  #   mutate() %>%
+  #   select(s1,s2) %>%
+  #   group_by(s2) %>%
+  #   mutate(corridor = dplyr::cur_group_id()) %>%
+  #   group_by(corridor) %>%
+  #   dplyr::group_modify(~{
+  #     tibble(
+  #       s = c(.x$s1, dplyr::first(.x$s2))
+  #     )
+  #   }) %>%
+  #   ungroup() %>%
+  #   mutate(i = row_number()) %>%
+  #   tidyr::separate_rows(.data$s, sep = ",") %>%
+  #   group_by(.data$i) %>%
+  #   mutate(x2 = lead(.data$s)) %>%
+  #   ungroup() %>%
+  #   filter(!is.na(.data$x2)) %>%
+  #   rename(x1 = .data$s) %>%
+  #   distinct(.data$corridor, .data$x1, .data$x2) %>%
+  #   select(.data$corridor, .data$x1, .data$x2) %>%
+  #   rename(o = .data$x1, d = .data$x2)
+  #
+  #
+  # super_sequences <-
+  # tibble(
+  #     s1 = toy_ordinary_sequences$s,
+  #     s2 = toy_ordinary_sequences$s
+  #   ) %>%
+  #   tidyr::expand(.data$s1,.data$s2) %>%
+  #   filter(.data$s1 != .data$s2) %>%
+  #   mutate(is_subset = stringr::str_detect(.data$s2,.data$s1)) %>%
+  #   group_by(.data$s1) %>%
+  #   summarise(subset_count = sum(.data$is_subset)) %>%
+  #   filter(.data$subset_count == 0) %>%
+  #   pull(.data$s1)
+  #
+  #
+  #
+  #
+  #
+  #
+  #
+  #     tibble(
+  #     s = super_sequences,
+  #   ) %>%
+  #   rowwise() %>%
+  #   mutate(
+  #     o = stringr::str_split(.data$s, ",") %>% purrr::pluck(1) %>% dplyr::first(),
+  #     d = stringr::str_split(.data$s, ",") %>% purrr::pluck(1) %>% dplyr::last()
+  #   ) %>%
+  #   ungroup() %>%
+  #   group_by(.data$o,.data$d) %>%
+  #   mutate(corridor = dplyr::cur_group_id()) %>%
+  #   ungroup() %>%
+  #   mutate(i = row_number()) %>%
+  #   tidyr::separate_rows(.data$s, sep = ",") %>%
+  #   group_by(.data$i) %>%
+  #   mutate(x2 = lead(.data$s)) %>%
+  #   ungroup() %>%
+  #   filter(!is.na(.data$x2)) %>%
+  #   rename(x1 = .data$s) %>%
+  #   distinct(.data$corridor, .data$x1, .data$x2) %>%
+  #   select(.data$corridor, .data$x1, .data$x2) %>%
+  #   rename(o = .data$x1, d = .data$x2)
 
   return(corridors)
 }
