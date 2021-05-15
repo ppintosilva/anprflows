@@ -249,20 +249,19 @@ ordinary_sequences <- function(sequences,
 }
 
 
-#' Compute corridor set from ordinary sequences
+#' Find the subset of ordinary sequences that are not a substring of any other sequence
 #'
 #' @param ord_sequences tibble of ordinary sequences
 #'
-#' @return tibble of corridors
+#' @return tibble of sequences that are not a substring of any other sequence
 #' @export
 #'
-get_corridor_set <- function(ord_sequences) {
+get_super_sequences <- function(ord_sequences) {
 
-  super_sequences <-
-    tibble(
-      s1 = ord_sequences$s,
-      s2 = ord_sequences$s
-    ) %>%
+  tibble(
+    s1 = ord_sequences$s,
+    s2 = ord_sequences$s
+  ) %>%
     tidyr::expand(.data$s1,.data$s2) %>%
     filter(.data$s1 != .data$s2) %>%
     mutate(is_subset = stringr::str_detect(.data$s2,.data$s1)) %>%
@@ -270,12 +269,22 @@ get_corridor_set <- function(ord_sequences) {
     summarise(subset_count = sum(.data$is_subset)) %>%
     filter(.data$subset_count == 0) %>%
     pull(.data$s1)
+}
 
 
-  groups_super_sequences <-   tibble(
-      s1 = super_sequences,
-      s2 = super_sequences
-    ) %>%
+#' Compute the cross product of one set of trip sequences and annotate them
+#'
+#' @param super_sequences tibble of ordinary sequences
+#'
+#' @return expanded tibble of super_sequences
+#' @export
+#'
+cross_super_sequences <- function(super_sequences) {
+
+  tibble(
+    s1 = super_sequences,
+    s2 = super_sequences
+  ) %>%
     tidyr::expand(.data$s1,.data$s2) %>%
     filter(.data$s1 != .data$s2) %>%
     mutate(
@@ -289,7 +298,25 @@ get_corridor_set <- function(ord_sequences) {
       s2_has_o1 = purrr::map2_lgl(.x = .data$s2, .y = .data$o1, ~ .y %in% seq_split(.x)),
       s2_has_d1 = purrr::map2_lgl(.x = .data$s2, .y = .data$d1, ~ .y %in% seq_split(.x)),
       has_od = .data$s2_has_o1 & .data$s2_has_d1
-    ) %>%
+    )
+}
+
+
+
+#' Compute corridor set from ordinary sequences
+#'
+#' @param ord_sequences tibble of ordinary sequences
+#'
+#' @return tibble of corridors
+#' @export
+#'
+get_corridor_set <- function(ord_sequences) {
+
+  super_sequences <- get_super_sequences(ord_sequences)
+  matrix_super_sequences <- cross_super_sequences(super_sequences)
+
+  groups_super_sequences <-
+    matrix_super_sequences %>%
     filter(.data$same_od | .data$has_od) %>%
     group_by(.data$o2,.data$d2) %>%
     mutate(i = dplyr::cur_group_id()) %>%
@@ -299,8 +326,6 @@ get_corridor_set <- function(ord_sequences) {
         s = union(.x$s1, .x$s2)
       )
     })
-
-  # tmp2 <- tmp %>% filter(same_od | has_od) %>% group_by(o2,d2) %>%
 
   corridors <-
     tibble(
@@ -323,72 +348,6 @@ get_corridor_set <- function(ord_sequences) {
     select(.data$corridor, .data$x1, .data$x2) %>%
     rename(o = .data$x1, d = .data$x2) %>%
     arrange(.data$corridor)
-
-
-  #   mutate() %>%
-  #   select(s1,s2) %>%
-  #   group_by(s2) %>%
-  #   mutate(corridor = dplyr::cur_group_id()) %>%
-  #   group_by(corridor) %>%
-  #   dplyr::group_modify(~{
-  #     tibble(
-  #       s = c(.x$s1, dplyr::first(.x$s2))
-  #     )
-  #   }) %>%
-  #   ungroup() %>%
-  #   mutate(i = row_number()) %>%
-  #   tidyr::separate_rows(.data$s, sep = ",") %>%
-  #   group_by(.data$i) %>%
-  #   mutate(x2 = lead(.data$s)) %>%
-  #   ungroup() %>%
-  #   filter(!is.na(.data$x2)) %>%
-  #   rename(x1 = .data$s) %>%
-  #   distinct(.data$corridor, .data$x1, .data$x2) %>%
-  #   select(.data$corridor, .data$x1, .data$x2) %>%
-  #   rename(o = .data$x1, d = .data$x2)
-  #
-  #
-  # super_sequences <-
-  # tibble(
-  #     s1 = toy_ordinary_sequences$s,
-  #     s2 = toy_ordinary_sequences$s
-  #   ) %>%
-  #   tidyr::expand(.data$s1,.data$s2) %>%
-  #   filter(.data$s1 != .data$s2) %>%
-  #   mutate(is_subset = stringr::str_detect(.data$s2,.data$s1)) %>%
-  #   group_by(.data$s1) %>%
-  #   summarise(subset_count = sum(.data$is_subset)) %>%
-  #   filter(.data$subset_count == 0) %>%
-  #   pull(.data$s1)
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #     tibble(
-  #     s = super_sequences,
-  #   ) %>%
-  #   rowwise() %>%
-  #   mutate(
-  #     o = stringr::str_split(.data$s, ",") %>% purrr::pluck(1) %>% dplyr::first(),
-  #     d = stringr::str_split(.data$s, ",") %>% purrr::pluck(1) %>% dplyr::last()
-  #   ) %>%
-  #   ungroup() %>%
-  #   group_by(.data$o,.data$d) %>%
-  #   mutate(corridor = dplyr::cur_group_id()) %>%
-  #   ungroup() %>%
-  #   mutate(i = row_number()) %>%
-  #   tidyr::separate_rows(.data$s, sep = ",") %>%
-  #   group_by(.data$i) %>%
-  #   mutate(x2 = lead(.data$s)) %>%
-  #   ungroup() %>%
-  #   filter(!is.na(.data$x2)) %>%
-  #   rename(x1 = .data$s) %>%
-  #   distinct(.data$corridor, .data$x1, .data$x2) %>%
-  #   select(.data$corridor, .data$x1, .data$x2) %>%
-  #   rename(o = .data$x1, d = .data$x2)
 
   return(corridors)
 }
@@ -419,4 +378,102 @@ get_corridors <- function(observed_sequences, distances, ndays, G, min_rate, min
       min_utility = min_utility
     ) %>%
     get_corridor_set()
+}
+
+
+#' Get first element of a string sequence
+#'
+#' @param s string sequence
+#' @param ... arguments passed to seq_split
+#'
+#' @return character
+#' @export
+seq_first <- function(s, ...) {
+  seq_split(s, ...) %>% dplyr::first()
+}
+
+#' Get last element of a string sequence
+#'
+#' @param s string sequence
+#' @param ... arguments passed to seq_split
+#'
+#' @return character
+#' @export
+seq_last <- function(s, ...) {
+  seq_split(s, ...) %>% dplyr::last()
+}
+
+#' Split string sequence by sep
+#'
+#' @param s string sequence
+#' @param sep separator character
+#'
+#' @return character
+#' @export
+seq_split <- function(s, sep = ",") {
+  stringr::str_split(s, sep) %>% purrr::pluck(1)
+}
+
+
+
+#' Find and return the source node of a graph
+#'
+#' @param g igraph
+#'
+#' @return source node, if exists, null otherwise
+#' @export
+get_source <- function(g) {
+  indeg <- igraph::degree(g, mode = "in")
+  s <- indeg[which(indeg == 0)]
+
+  if(length(s) == 0)
+    return(NA)
+  else
+    names(s)
+}
+
+#' Find and return the sink node of a graph
+#'
+#' @param g igraph
+#'
+#' @return sink node, if exists, null otherwise
+#' @export
+get_sink <- function(g) {
+  outdeg <- igraph::degree(g, mode = "out")
+  t <- outdeg[which(outdeg == 0)]
+
+  if(length(t) == 0)
+    return(NA)
+  else
+    names(t)
+}
+
+
+#' Determine if the input corridor is valid
+#'
+#' @param corridor tibble
+#'
+#' @return logical
+#' @export
+is_valid_corridor <- function(corridor) {
+  # tests: is_dag, one source, one sink, no isolated nodes
+  #
+  g <- igraph::graph_from_data_frame(corridor)
+  deg <- igraph::degree(g, mode = "all")
+  s <- get_source(g)
+  t <- get_sink(g)
+
+  igraph::is_dag(g) &
+    !is.na(s) & length(s) == 1 &
+    !is.na(t) & length(t) == 1 &
+    sum(deg == 0) == 0
+}
+
+
+is_valid_corridor_set <- function(corridor_set) {
+  # tests:
+  #  - every corridor is a valid corridor
+  #  - no two corridor with same source and sink
+  #  -
+  #
 }

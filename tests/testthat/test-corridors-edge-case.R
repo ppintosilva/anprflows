@@ -30,21 +30,6 @@ ordinary_sequences <- tibble::tribble(
      )
 
 
-# ordinary_sequences2 <- tibble::tribble(
-#                  ~s, ~l,
-#           "130,235", 2L,
-#   "130,235,158,253", 4L,
-#    "130,235,58,253", 4L,
-#           "158,253", 2L,
-#           "235,158", 2L,
-#       "235,158,253", 3L,
-#            "235,58", 2L,
-#        "235,58,253", 3L,
-#            "58,253", 2L
-#   )
-
-
-
 expected_corridor <- tibble::tribble(
   ~corridor,    ~o,    ~d,
   1L, "209",  "54",

@@ -97,34 +97,3 @@ try_st_crop <- function(sf_tibble, bbox, sf_name) {
     return(cropped_sf)
   }
 }
-
-
-#' Get first element of a string sequence
-#'
-#' @param s string sequence
-#' @param ... arguments passed to seq_split
-#'
-#' @return character
-seq_first <- function(s, ...) {
-  seq_split(s, ...) %>% dplyr::first()
-}
-
-#' Get last element of a string sequence
-#'
-#' @param s string sequence
-#' @param ... arguments passed to seq_split
-#'
-#' @return character
-seq_last <- function(s, ...) {
-  seq_split(s, ...) %>% dplyr::last()
-}
-
-#' Split string sequence by sep
-#'
-#' @param s string sequence
-#' @param sep separator character
-#'
-#' @return character
-seq_split <- function(s, sep = ",") {
-  stringr::str_split(s, sep) %>% purrr::pluck(1)
-}
