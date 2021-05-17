@@ -4,7 +4,7 @@
 \alias{is_valid_corridor}
 \title{Determine if the input corridor is valid}
 \usage{
-is_valid_corridor(corridor)
+is_valid_corridor(corridor, ord_seq = NULL)
 }
 \arguments{
 \item{corridor}{tibble}

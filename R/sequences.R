@@ -313,28 +313,16 @@ cross_super_sequences <- function(super_sequences) {
 get_corridor_set <- function(ord_sequences) {
 
   super_sequences <- get_super_sequences(ord_sequences)
-  matrix_super_sequences <- cross_super_sequences(super_sequences)
-
-  groups_super_sequences <-
-    matrix_super_sequences %>%
-    filter(.data$same_od | .data$has_od) %>%
-    group_by(.data$o2,.data$d2) %>%
-    mutate(i = dplyr::cur_group_id()) %>%
-    group_by(.data$i) %>%
-    dplyr::group_modify(~{
-      tibble(
-        s = union(.x$s1, .x$s2)
-      )
-    })
 
   corridors <-
     tibble(
       s = super_sequences
     ) %>%
-    anti_join(groups_super_sequences, by = "s") %>%
-    mutate(i = 100000L + row_number()) %>%
-    bind_rows(groups_super_sequences) %>%
-    group_by(.data$i) %>%
+    mutate(
+      o = purrr::map_chr(.data$s, ~ seq_first(.x)),
+      d = purrr::map_chr(.data$s, ~ seq_last(.x))
+    ) %>%
+    group_by(.data$o,.data$d) %>%
     mutate(corridor = dplyr::cur_group_id()) %>%
     ungroup() %>%
     mutate(i = row_number()) %>%
@@ -455,18 +443,34 @@ get_sink <- function(g) {
 #'
 #' @return logical
 #' @export
-is_valid_corridor <- function(corridor) {
-  # tests: is_dag, one source, one sink, no isolated nodes
+is_valid_corridor <- function(corridor, ord_seq = NULL) {
+  # tests: is_dag, one source, one sink, no isolated nodes,
   #
   g <- igraph::graph_from_data_frame(corridor)
   deg <- igraph::degree(g, mode = "all")
   s <- get_source(g)
   t <- get_sink(g)
 
-  igraph::is_dag(g) &
+  valid_structure <-
+    igraph::is_dag(g) &
     !is.na(s) & length(s) == 1 &
     !is.na(t) & length(t) == 1 &
     sum(deg == 0) == 0
+
+  # every path from source to sink is ordinary
+  if(valid_structure & !is.null(ord_seq)) {
+    paths <- igraph::all_simple_paths(g, s, t, mode = "out")
+
+    path_sequences <- purrr::map(
+      .x = paths,
+      .f = ~ names(.x) %>% stringr::str_c(collapse = ",")
+    )
+
+    return(all(purrr::map_lgl(path_sequences, ~ .x %in% ord_seq)))
+
+  } else {
+    return(valid_structure)
+  }
 }
 
 

@@ -30,7 +30,9 @@ ordinary_sequences <- tibble::tribble(
      )
 
 
-expected_corridor <- tibble::tribble(
+ordinary_sequences_2 <- dplyr::add_row(ordinary_sequences, s = "209,54,135,148,112,199", l = 6L)
+
+expected_corridor_2 <- tibble::tribble(
   ~corridor,    ~o,    ~d,
   1L, "209",  "54",
   1L,  "54", "135",
@@ -41,12 +43,21 @@ expected_corridor <- tibble::tribble(
   1L, "112", "199"
 )
 
-
 test_that("multiplication works", {
 
+  observed_corridor_1 <- get_corridor_set(ordinary_sequences) %>% arrange(corridor,o,d)
+  observed_corridor_2 <- get_corridor_set(ordinary_sequences_2) %>% arrange(corridor,o,d)
+
+
+  expect_equal(observed_corridor_1 %>% summarise(n = dplyr::n_distinct(corridor)) %>% pull(n), 3)
+
+  expect_true(observed_corridor_1 %>% summarise(n = dplyr::n_distinct(corridor)) %>% pull(n)
+              !=
+              observed_corridor_2 %>% summarise(n = dplyr::n_distinct(corridor)) %>% pull(n))
+
   expect_equal(
-    get_corridor_set(ordinary_sequences) %>% arrange(corridor,o,d),
-    expected_corridor %>% arrange(corridor, o, d)
+    observed_corridor_2 %>% arrange(corridor, o, d),
+    expected_corridor_2 %>% arrange(corridor, o, d)
   )
 
 })

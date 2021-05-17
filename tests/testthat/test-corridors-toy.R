@@ -71,16 +71,16 @@ distances <-
 
 expected_corridors <- tibble::tribble(
   ~corridor,  ~o,  ~d,
-  1L, "B", "D",
-  1L, "B", "F",
-  1L, "D", "F",
-  1L, "F", "G",
-  1L, "D", "G",
+  1L, "A", "B",
+  1L, "B", "C",
   2L, "A", "B",
-  2L, "B", "C",
-  3L, "A", "B",
-  3L, "B", "E",
-  4L, "D", "E"
+  2L, "B", "E",
+  3L, "B", "D",
+  3L, "B", "F",
+  3L, "D", "F",
+  3L, "F", "G",
+  4L, "D", "E",
+  5L, "D", "G"
 )
 
 

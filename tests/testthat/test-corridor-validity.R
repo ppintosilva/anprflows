@@ -13,6 +13,57 @@ valid_corridors <-
            "2", "161", "100"
      )
 
+
+valid_corridors_ord_sequences <-
+  tibble::tribble(
+                         ~s, ~l,
+                   "100,11", 2L,
+                "100,11,12", 3L,
+                "100,11,73", 3L,
+             "100,11,73,61", 4L,
+                  "100,143", 2L,
+              "100,143,233", 3L,
+          "100,143,233,230", 4L,
+                   "100,69", 2L,
+                "100,69,11", 3L,
+             "100,69,11,12", 4L,
+         "100,69,11,12,228", 5L,
+            "100,69,11,265", 4L,
+         "100,69,11,265,83", 5L,
+             "100,69,11,73", 4L,
+         "100,69,11,73,168", 5L,
+          "100,69,11,73,61", 5L,
+               "100,69,110", 3L,
+            "100,69,110,22", 4L,
+        "100,69,110,22,244", 5L,
+            "100,69,110,49", 4L,
+               "100,69,126", 3L,
+           "100,69,126,167", 4L,
+               "100,69,235", 3L,
+            "100,69,235,58", 4L,
+                  "101,100", 2L,
+               "101,100,11", 3L,
+            "101,100,11,73", 4L,
+               "101,100,69", 3L,
+            "101,100,69,11", 4L,
+         "101,100,69,11,73", 5L,
+           "101,100,69,110", 4L,
+           "101,100,69,126", 4L,
+                  "101,161", 2L,
+              "101,161,100", 3L,
+           "101,161,100,11", 4L,
+        "101,161,100,11,73", 5L,
+           "101,161,100,69", 4L,
+        "101,161,100,69,11", 5L,
+     "101,161,100,69,11,73", 6L,
+       "101,161,100,69,110", 5L,
+       "101,161,100,69,126", 5L,
+               "101,161,64", 3L,
+           "101,161,64,146", 4L,
+                   "101,64", 2L
+     )
+
+
 invalid_corridors <-
   tibble::tribble(
      ~corridor,    ~o,    ~d,
@@ -44,7 +95,7 @@ corridors <- bind_rows(
   group_by(corridor) %>%
   dplyr::group_modify(~{
     tibble(
-      is_valid = anprflows::is_valid_corridor(.x %>% select(o,d)),
+      is_valid = anprflows::is_valid_corridor(.x %>% select(o,d), ord_seq = valid_corridors_ord_sequences$s),
       g = list(igraph::graph_from_data_frame(.x %>% select(o,d))),
       expected_valid = dplyr::first(.x$expected_valid)
     ) %>%
@@ -56,7 +107,6 @@ corridors <- bind_rows(
   mutate(corridor = as.integer(corridor)) %>%
   arrange(corridor) %>%
   ungroup()
-
 
 test_that("get source sink works", {
 
